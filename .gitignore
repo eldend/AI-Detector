@@ -1,0 +1,50 @@
+# === Global ===
+*.log
+*.tmp
+.DS_Store
+.env
+.env.local
+.env.*.local
+.vscode/
+.idea/
+*.iml
+
+# === Frontend ===
+/frontend/node_modules/
+/frontend/.next/
+/frontend/dist/
+/frontend/build/
+/frontend/.env
+/frontend/.env.*.local
+
+# Vite, React, Next.js 등에 따라 포함됨
+/frontend/coverage/
+/frontend/.turbo/
+/frontend/.cache/
+/frontend/yarn.lock
+/frontend/package-lock.json
+
+# === Backend ===
+/backend/target/
+/backend/.env
+/backend/.classpath
+/backend/.project
+/backend/.settings/
+/backend/.mvn/
+/backend/mvnw.cmd
+/backend/mvnw
+
+# === OS 관련 ===
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# === Git ===
+*.swp
+*.swo
+*.bak
+*.old
+*.orig
+*.rej
+*.sublime-workspace
+*.sublime-project
