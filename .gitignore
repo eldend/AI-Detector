@@ -48,3 +48,6 @@ desktop.ini
 *.rej
 *.sublime-workspace
 *.sublime-project
+
+# === md ===
+*.md
