@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.57",
+    "@langchain/openai": "^0.5.12",
     "chart.js": "^4.4.1",
     "framer-motion": "^10.16.4",
     "next": "14.0.0",
@@ -28,4 +30,3 @@
     "typescript": "^5.2.2"
   }
 }
-
