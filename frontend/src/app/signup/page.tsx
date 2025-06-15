@@ -41,28 +41,28 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-dark-DEFAULT p-4">
+    <main className="min-h-screen flex items-center justify-center bg-app-background p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="card w-full max-w-md"
+        className="bg-white-900 backdrop-blur-md border border-app-accent-200 rounded-xl shadow-xl p-8 w-full max-w-md"
       >
-        <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold text-center mb-6 text-app-primary">
           AI Detector 회원가입
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               htmlFor="username"
-              className="block text-gray-400 text-sm font-bold mb-2"
+              className="block text-app-text text-sm font-semibold mb-2"
             >
               사용자 이름
             </label>
             <input
               type="text"
               id="username"
-              className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark-lighter border-gray-600 !text-white"
+              className="input-field w-full"
               placeholder="사용자 이름을 입력하세요"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -72,14 +72,14 @@ export default function SignupPage() {
           <div className="mb-4">
             <label
               htmlFor="password"
-              className="block text-gray-400 text-sm font-bold mb-2"
+              className="block text-app-text text-sm font-semibold mb-2"
             >
               비밀번호
             </label>
             <input
               type="password"
               id="password"
-              className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark-lighter border-gray-600 !text-white"
+              className="input-field w-full"
               placeholder="비밀번호를 입력하세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -89,14 +89,14 @@ export default function SignupPage() {
           <div className="mb-6">
             <label
               htmlFor="confirmPassword"
-              className="block text-gray-400 text-sm font-bold mb-2"
+              className="block text-app-text text-sm font-semibold mb-2"
             >
               비밀번호 확인
             </label>
             <input
               type="password"
               id="confirmPassword"
-              className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark-lighter border-gray-600 !text-white"
+              className="input-field w-full"
               placeholder="비밀번호를 다시 입력하세요"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -104,25 +104,47 @@ export default function SignupPage() {
             />
           </div>
           {error && (
-            <p className="text-danger text-center text-sm mb-4">{error}</p>
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-red-600 text-center text-sm mb-4 bg-red-50 border border-red-200 rounded-md p-2"
+            >
+              {error}
+            </motion.p>
           )}
           {success && (
-            <p className="text-primary text-center text-sm mb-4">{success}</p>
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-green-600 text-center text-sm mb-4 bg-green-50 border border-green-200 rounded-md p-2"
+            >
+              {success}
+            </motion.p>
           )}
           <div className="flex items-center justify-between">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
-              className="btn btn-primary w-full"
+              className="btn bg-app-primary hover:bg-app-primary-700 text-white w-full py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
               disabled={loading}
             >
-              {loading ? "회원가입 중..." : "회원가입"}
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  회원가입 중...
+                </div>
+              ) : (
+                "회원가입"
+              )}
             </motion.button>
           </div>
-          <p className="text-center text-gray-400 text-sm mt-4">
+          <p className="text-center text-app-secondary text-sm mt-6">
             이미 계정이 있으신가요?
-            <Link href="/login" className="text-primary hover:underline ml-1">
+            <Link
+              href="/login"
+              className="text-app-primary hover:text-app-primary-700 font-medium hover:underline ml-1 transition-colors"
+            >
               로그인
             </Link>
           </p>

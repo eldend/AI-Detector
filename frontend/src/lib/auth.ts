@@ -4,43 +4,35 @@ import {
   JwtResponse,
   MessageResponse,
 } from "@/types/auth";
+import axiosInstance from "./axios";
 
 const API_BASE_URL = "http://localhost:8080/api/auth";
 
 export async function login(credentials: LoginRequest): Promise<JwtResponse> {
-  const response = await fetch(`${API_BASE_URL}/signin`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Login Error Response:", errorData);
-    throw new Error(errorData.message || "로그인 실패");
+  try {
+    const response = await axiosInstance.post("/auth/signin", credentials);
+    const token = response.data.accessToken || response.data.token;
+    if (!token) {
+      throw new Error("토큰이 응답에 포함되어 있지 않습니다.");
+    }
+    return {
+      ...response.data,
+      token: token,
+    };
+  } catch (error: any) {
+    console.error("Login Error:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || "로그인 실패");
   }
-
-  return response.json();
 }
 
 export async function register(
   userData: SignupRequest
 ): Promise<MessageResponse> {
-  const response = await fetch(`${API_BASE_URL}/signup`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userData),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Signup Error Response:", errorData);
-    throw new Error(errorData.message || "회원가입 실패");
+  try {
+    const response = await axiosInstance.post("/auth/signup", userData);
+    return response.data;
+  } catch (error: any) {
+    console.error("Signup Error:", error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || "회원가입 실패");
   }
-
-  return response.json();
 }
