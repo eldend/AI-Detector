@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./theme.css";
 import type { Metadata } from "next";
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -14,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="bg-dark-DEFAULT min-h-screen text-white">
+      <body className="bg-app-background min-h-screen text-app-text">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

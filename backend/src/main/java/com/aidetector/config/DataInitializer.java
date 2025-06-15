@@ -22,8 +22,13 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // 샘플 데이터 생성
-        createSampleEvents();
+        // 애플리케이션 시작 시 샘플 데이터가 없는 경우에만 생성
+        if (eventRepository.count() == 0) {
+            createSampleEvents();
+            System.out.println("샘플 데이터가 성공적으로 초기화되었습니다.");
+        } else {
+            System.out.println("이미 샘플 데이터가 존재하여 초기화를 건너뛰었습니다.");
+        }
     }
 
     private void createSampleEvents() {

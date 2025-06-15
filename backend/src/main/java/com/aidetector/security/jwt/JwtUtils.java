@@ -24,11 +24,11 @@ public class JwtUtils {
 
     @PostConstruct
     public void init() {
+        // HS512 알고리즘에 맞는 안전한 키 생성
         this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
     public String generateJwtToken(Authentication authentication) {
-
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
         return Jwts.builder()
@@ -47,7 +47,7 @@ public class JwtUtils {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
             return true;
-        } catch (io.jsonwebtoken.security.SignatureException e) {
+        } catch (SignatureException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());
         } catch (MalformedJwtException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
