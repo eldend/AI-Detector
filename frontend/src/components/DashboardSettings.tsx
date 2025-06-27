@@ -291,20 +291,6 @@ export default function DashboardSettings({
                   </motion.button>
                 </div>
               </div>
-
-              {/* Instructions */}
-              <div className="bg-app-accent-100 border border-app-accent-200 rounded-lg p-4">
-                <h4 className="font-medium text-app-text mb-2">사용 방법</h4>
-                <ul className="text-sm text-app-secondary space-y-1">
-                  <li>• 설정 버튼을 드래그해서 원하는 위치로 이동</li>
-                  <li>• 위젯을 드래그해서 위치 변경</li>
-                  <li>• 위젯 모서리를 드래그해서 크기 조절</li>
-                  <li>• 편집 버튼으로 위젯 설정 변경</li>
-                  <li>• 복사 버튼으로 위젯 복제</li>
-                  <li>• 사용자 정의 위젯은 삭제 가능</li>
-                  <li>• 설정은 자동으로 저장됩니다</li>
-                </ul>
-              </div>
             </motion.div>
           </>
         )}

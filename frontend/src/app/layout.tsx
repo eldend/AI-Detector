@@ -2,6 +2,7 @@ import "./globals.css";
 import "./theme.css";
 import type { Metadata } from "next";
 import { AuthProvider } from "@/context/AuthContext";
+import { DashboardProvider } from "@/context/DashboardContext";
 
 export const metadata: Metadata = {
   title: "AI Detector - 악성프로세스 탐지 시스템",
@@ -14,9 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
-      <body className="bg-app-background min-h-screen text-app-text">
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="ko" className="h-full">
+      <body className="h-full bg-app-background text-app-text">
+        <AuthProvider>
+          <DashboardProvider>{children}</DashboardProvider>
+        </AuthProvider>
       </body>
     </html>
   );
