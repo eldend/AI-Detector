@@ -70,7 +70,7 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute right-0 mt-2 w-48 bg-app-background-800 backdrop-blur-md rounded-xl shadow-xl border border-app-primary-300 py-2 z-10"
+                className="absolute right-0 mt-2 w-48 bg-app-background-800 backdrop-blur-md rounded-xl shadow-xl border border-app-primary-300 py-2 z-10 overflow-hidden px-2"
               >
                 {/* Settings Button */}
                 <motion.button
@@ -81,7 +81,8 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                     onOpenSettings?.();
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-4 py-2 text-sm text-app-text hover:bg-app-primary-100 hover:text-app-primary transition-all duration-200 rounded-lg mx-2 flex items-center"
+                  className="block w-full text-left px-4 py-2 text-sm text-app-text hover:bg-app-primary-100 hover:text-app-primary transition-all duration-200 flex items-center rounded-t-md"
+                  style={{ boxSizing: "border-box" }}
                 >
                   <svg
                     className="w-4 h-4 mr-2"
@@ -112,13 +113,14 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.2, delay: (index + 1) * 0.05 }}
-                    className="block px-4 py-2 text-sm text-app-text hover:bg-app-primary-100 hover:text-app-primary transition-all duration-200 rounded-lg mx-2"
+                    className="block w-full text-left px-4 py-2 text-sm text-app-text hover:bg-app-primary-100 hover:text-app-primary transition-all duration-200 rounded-md"
+                    style={{ boxSizing: "border-box" }}
                   >
                     {item.label}
                   </motion.a>
                 ))}
 
-                <div className="border-t border-app-primary-200 my-2 mx-2" />
+                <div className="border-t border-app-primary-200 my-2" />
 
                 <motion.button
                   initial={{ opacity: 0, x: -10 }}
@@ -128,7 +130,8 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                     delay: (menuItems.length + 1) * 0.05,
                   }}
                   onClick={onLogout}
-                  className="block w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 hover:text-danger transition-all duration-200 rounded-lg mx-2"
+                  className="block w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 hover:text-danger transition-all duration-200 rounded-b-md"
+                  style={{ boxSizing: "border-box" }}
                 >
                   로그아웃
                 </motion.button>

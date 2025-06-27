@@ -67,6 +67,63 @@ export default function Sidebar() {
       ),
     },
     {
+      href: "/analysis",
+      label: "Analysis",
+      icon: (
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M11 17a2.5 2.5 0 01-2.45-2H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v6a2 2 0 01-2 2h-3.55A2.5 2.5 0 0113 17h-2z"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "/policy",
+      label: "Policy",
+      icon: (
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8c-1.657 0-3 1.343-3 3 0 1.657 1.343 3 3 3s3-1.343 3-3c0-1.657-1.343-3-3-3zm0 10c-4.418 0-8-1.79-8-4V7a2 2 0 012-2h12a2 2 0 012 2v7c0 2.21-3.582 4-8 4z"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "/response",
+      label: "Response",
+      icon: (
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 17v-2a4 4 0 014-4h4m0 0V7m0 4l-4-4m0 0l-4 4"
+          />
+        </svg>
+      ),
+    },
+    {
       href: "/settings",
       label: "Settings",
       icon: (
@@ -184,13 +241,6 @@ export default function Sidebar() {
           })}
         </ul>
       </nav>
-
-      {/* Footer */}
-      <div className="mt-auto pt-6 border-t border-app-primary-200">
-        <p className="text-xs text-app-text-500 text-center">
-          &copy; 2024 AI Detector
-        </p>
-      </div>
     </motion.aside>
   );
 }
