@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -33,18 +34,7 @@ export default function Home() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-slate-600 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-300 font-mono">Loading...</p>
-        </motion.div>
-      </div>
-    );
+    return <LoadingScreen message="Checking authentication status..." />;
   }
 
   return (
@@ -155,6 +145,130 @@ export default function Home() {
             <div className="w-1 h-1 bg-purple-400/50 rounded-full absolute top-1 right-1"></div>
             <div className="w-1 h-1 bg-purple-400/50 rounded-full absolute bottom-1 left-1"></div>
             <div className="w-1 h-1 bg-purple-400/50 rounded-full absolute bottom-1 right-1"></div>
+          </motion.div>
+        ))}
+
+        {/* 3D Floating Bubbles Background */}
+        {[
+          {
+            size: 400,
+            x: "15%",
+            y: "20%",
+            color: "rgba(59, 130, 246, 0.8)",
+            delay: 0,
+          },
+          {
+            size: 300,
+            x: "75%",
+            y: "60%",
+            color: "rgba(139, 92, 246, 0.7)",
+            delay: 2,
+          },
+          {
+            size: 250,
+            x: "5%",
+            y: "70%",
+            color: "rgba(236, 72, 153, 0.6)",
+            delay: 4,
+          },
+          {
+            size: 350,
+            x: "85%",
+            y: "15%",
+            color: "rgba(34, 197, 94, 0.5)",
+            delay: 6,
+          },
+          {
+            size: 200,
+            x: "45%",
+            y: "85%",
+            color: "rgba(251, 191, 36, 0.6)",
+            delay: 8,
+          },
+          {
+            size: 320,
+            x: "60%",
+            y: "35%",
+            color: "rgba(168, 85, 247, 0.7)",
+            delay: 10,
+          },
+        ].map((bubble, i) => (
+          <motion.div
+            key={`3d-bubble-${i}`}
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: `${bubble.size}px`,
+              height: `${bubble.size}px`,
+              left: bubble.x,
+              top: bubble.y,
+              background: `radial-gradient(circle at 25% 25%, ${
+                bubble.color
+              } 0%, ${bubble.color
+                .replace("0.", "0.3")
+                .replace("0.3", "0.2")} 40%, ${bubble.color.replace(
+                /0\.\d/,
+                "0.1"
+              )} 70%, transparent 85%)`,
+              filter: "brightness(1.3) blur(0.8px)",
+              zIndex: -1,
+            }}
+            animate={{
+              y: [-30, 30, -30],
+              x: [-20, 20, -20],
+              scale: [1, 1.05, 1],
+            }}
+            transition={{
+              duration: Math.random() * 8 + 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: bubble.delay,
+            }}
+          >
+            {/* 3D highlight effect */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: "60%",
+                height: "60%",
+                top: "15%",
+                left: "15%",
+                background: `radial-gradient(circle at 20% 20%, ${bubble.color.replace(
+                  /0\.\d/,
+                  "0.9"
+                )} 0%, transparent 60%)`,
+                filter: "blur(2px)",
+              }}
+            ></div>
+
+            {/* Inner core glow */}
+            <div
+              className="absolute rounded-full animate-pulse"
+              style={{
+                width: "30%",
+                height: "30%",
+                top: "20%",
+                left: "20%",
+                background: `radial-gradient(circle, ${bubble.color.replace(
+                  /0\.\d/,
+                  "1"
+                )} 0%, transparent 70%)`,
+                filter: "blur(1px)",
+              }}
+            ></div>
+
+            {/* Natural glass reflection */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: "18%",
+                height: "18%",
+                top: "15%",
+                left: "20%",
+                background:
+                  "radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 40%, transparent 70%)",
+                filter: "blur(0.8px)",
+              }}
+            ></div>
           </motion.div>
         ))}
 

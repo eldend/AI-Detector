@@ -34,8 +34,8 @@ interface TimeSeriesChartProps {
 
 export default function TimeSeriesChart({
   data,
-  title = "이상 탐지 점수 추이",
-  color = "#4a5568",
+  title = "Anomaly Score Trend",
+  color = "#60a5fa",
 }: TimeSeriesChartProps) {
   // Mock data for demonstration - replace with real data
   const mockData = [
@@ -62,7 +62,7 @@ export default function TimeSeriesChart({
   const chartConfig = {
     labels: chartData.map((item) => {
       const date = new Date(item.timestamp);
-      return date.toLocaleTimeString("ko-KR", {
+      return date.toLocaleTimeString("en-US", {
         month: "short",
         day: "numeric",
         hour: "2-digit",
@@ -73,17 +73,17 @@ export default function TimeSeriesChart({
       {
         label: "Anomaly Score",
         data: processedData.map((item) => item.y),
-        borderColor: color, // app-primary
-        backgroundColor: `${color}1A`, // app-primary with opacity
+        borderColor: "#60a5fa", // Terminal blue
+        backgroundColor: "rgba(96, 165, 250, 0.1)", // Terminal blue with opacity
         pointBackgroundColor: chartData.map((item) =>
-          item.label === "Anomaly" ? "#ef4444" : "#4a5568"
+          item.label === "Anomaly" ? "#f87171" : "#34d399"
         ),
         pointBorderColor: chartData.map((item) =>
-          item.label === "Anomaly" ? "#dc2626" : "#374151"
+          item.label === "Anomaly" ? "#ef4444" : "#10b981"
         ),
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        borderWidth: 3,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2,
         fill: true,
         tension: 0.4,
       },
@@ -97,39 +97,41 @@ export default function TimeSeriesChart({
       legend: {
         position: "top" as const,
         labels: {
-          color: "#2d3748", // app-text
+          color: "#cbd5e1", // Terminal text color
           font: {
-            size: 12,
+            family: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+            size: 11,
             weight: "normal" as const,
           },
         },
       },
       title: {
-        display: true,
-        text: title,
-        color: "#2d3748", // app-text
-        font: {
-          size: 16,
-          weight: "bold" as const,
-        },
-        padding: 20,
+        display: false, // We'll handle title in the wrapper
       },
       tooltip: {
-        backgroundColor: "rgba(255, 255, 255, 0.95)",
-        titleColor: "#2d3748",
-        bodyColor: "#4a5568",
-        borderColor: "#a2b2c1",
+        backgroundColor: "rgba(15, 23, 42, 0.95)", // Dark terminal background
+        titleColor: "#f1f5f9",
+        bodyColor: "#cbd5e1",
+        borderColor: "#475569",
         borderWidth: 1,
-        cornerRadius: 8,
+        cornerRadius: 6,
         padding: 12,
+        titleFont: {
+          family: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+          size: 12,
+        },
+        bodyFont: {
+          family: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+          size: 11,
+        },
         callbacks: {
           label: function (context: any) {
             const dataIndex = context.dataIndex;
             const item = chartData[dataIndex];
             return [
-              `점수: ${context.parsed.y.toFixed(2)}`,
-              `상태: ${item.label}`,
-              `시간: ${item.timestamp}`,
+              `Score: ${context.parsed.y.toFixed(3)}`,
+              `Status: ${item.label}`,
+              `Time: ${item.timestamp}`,
             ];
           },
         },
@@ -138,28 +140,30 @@ export default function TimeSeriesChart({
     scales: {
       x: {
         grid: {
-          color: "rgba(162, 178, 193, 0.2)",
+          color: "rgba(71, 85, 105, 0.3)", // Terminal grid color
           drawBorder: false,
         },
         ticks: {
-          color: "#718096", // app-secondary
+          color: "#94a3b8", // Terminal secondary text
           font: {
-            size: 11,
+            family: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+            size: 10,
           },
-          maxTicksLimit: 8,
+          maxTicksLimit: 6,
         },
       },
       y: {
         min: 0,
         max: 1,
         grid: {
-          color: "rgba(162, 178, 193, 0.2)",
+          color: "rgba(71, 85, 105, 0.3)", // Terminal grid color
           drawBorder: false,
         },
         ticks: {
-          color: "#718096", // app-secondary
+          color: "#94a3b8", // Terminal secondary text
           font: {
-            size: 11,
+            family: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+            size: 10,
           },
           callback: function (value: any) {
             return value.toFixed(1);
@@ -178,9 +182,9 @@ export default function TimeSeriesChart({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="card w-full h-full flex flex-col"
+      className="w-full h-full flex flex-col bg-transparent"
     >
-      <div className="flex-1 min-h-0 p-4">
+      <div className="flex-1 min-h-0 p-4 terminal-chart-container">
         <Line data={chartConfig} options={options} />
       </div>
     </motion.div>

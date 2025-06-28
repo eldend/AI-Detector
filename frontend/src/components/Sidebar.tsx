@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,14 +10,21 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { ensureEventLogWidgets } = useDashboard();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Real-time clock
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleEventLogClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // 대시보드 페이지로 이동
-    if (pathname !== "/") {
-      router.push("/");
+    if (pathname !== "/dashboard") {
+      router.push("/dashboard");
     }
-    // 이벤트로그 위젯이 없으면 생성
     setTimeout(() => {
       ensureEventLogWidgets();
     }, 100);
@@ -25,15 +33,19 @@ export default function Sidebar() {
   const navItems: Array<{
     href: string;
     label: string;
+    command: string;
     icon: React.ReactNode;
     onClick?: (e: React.MouseEvent) => void;
+    status?: string;
   }> = [
     {
       href: "/dashboard",
       label: "Dashboard",
+      command: "dashboard --realtime",
+      status: "ACTIVE",
       icon: (
         <svg
-          className="h-5 w-5"
+          className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -49,10 +61,12 @@ export default function Sidebar() {
     },
     {
       href: "/events",
-      label: "Events",
+      label: "Event Logs",
+      command: "tail -f events.log",
+      status: "MONITORING",
       icon: (
         <svg
-          className="h-5 w-5"
+          className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -68,10 +82,12 @@ export default function Sidebar() {
     },
     {
       href: "/analysis",
-      label: "Analysis",
+      label: "ML Analysis",
+      command: "analyze --ml-model",
+      status: "READY",
       icon: (
         <svg
-          className="h-5 w-5"
+          className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -80,17 +96,19 @@ export default function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M11 17a2.5 2.5 0 01-2.45-2H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v6a2 2 0 01-2 2h-3.55A2.5 2.5 0 0113 17h-2z"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
           />
         </svg>
       ),
     },
     {
       href: "/policy",
-      label: "Policy",
+      label: "Security Policy",
+      command: "policy --configure",
+      status: "LOADED",
       icon: (
         <svg
-          className="h-5 w-5"
+          className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -99,17 +117,19 @@ export default function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 8c-1.657 0-3 1.343-3 3 0 1.657 1.343 3 3 3s3-1.343 3-3c0-1.657-1.343-3-3-3zm0 10c-4.418 0-8-1.79-8-4V7a2 2 0 012-2h12a2 2 0 012 2v7c0 2.21-3.582 4-8 4z"
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
           />
         </svg>
       ),
     },
     {
       href: "/response",
-      label: "Response",
+      label: "Incident Response",
+      command: "incident --respond",
+      status: "STANDBY",
       icon: (
         <svg
-          className="h-5 w-5"
+          className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -118,17 +138,19 @@ export default function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M9 17v-2a4 4 0 014-4h4m0 0V7m0 4l-4-4m0 0l-4 4"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
           />
         </svg>
       ),
     },
     {
       href: "/settings",
-      label: "Settings",
+      label: "System Config",
+      command: "config --edit",
+      status: "IDLE",
       icon: (
         <svg
-          className="h-5 w-5"
+          className="h-4 w-4"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -150,89 +172,194 @@ export default function Sidebar() {
     },
   ];
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return "text-green-400";
+      case "MONITORING":
+        return "text-blue-400";
+      case "READY":
+        return "text-cyan-400";
+      case "LOADED":
+        return "text-violet-400";
+      case "STANDBY":
+        return "text-yellow-400";
+      default:
+        return "text-slate-400";
+    }
+  };
+
+  const getStatusDot = (status: string) => {
+    const color = getStatusColor(status);
+    return (
+      <div
+        className={`w-2 h-2 rounded-full ${color.replace(
+          "text-",
+          "bg-"
+        )} animate-pulse`}
+      ></div>
+    );
+  };
+
   return (
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-64 bg-app-background-700 backdrop-blur-md border-r border-app-primary-200 p-6 flex flex-col shadow-lg"
+      className="w-80 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/50 flex flex-col shadow-2xl font-mono"
     >
-      {/* Logo */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-app-primary to-app-secondary bg-clip-text text-transparent">
-          AI Detector
-        </h1>
-        <p className="text-xs text-app-text-600 mt-1">Security Dashboard</p>
+      {/* Terminal Header */}
+      <div className="bg-slate-800/70 border-b border-slate-700/50 p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          <div className="flex-1 text-center">
+            <span className="text-slate-400 text-sm">
+              ai-security-nav.terminal
+            </span>
+          </div>
+        </div>
+
+        {/* Logo/Brand */}
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded flex items-center justify-center">
+              <span className="text-white font-bold text-sm">AI</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">Security Control</h1>
+              <p className="text-xs text-slate-400 -mt-1">
+                v2.1.3 | Build 2024.1
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* System Status */}
+        <div className="bg-slate-800/50 rounded border border-slate-700/50 p-2 mt-3">
+          <div className="text-xs text-slate-400 mb-1">SYSTEM STATUS</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-green-400">ONLINE</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-blue-400">SECURED</span>
+            </div>
+          </div>
+          <div className="text-slate-500 text-xs mt-1">
+            {currentTime.toLocaleString("en-US", {
+              hour12: false,
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-grow">
-        <ul className="space-y-2">
+      <nav className="flex-grow p-4">
+        <div className="text-green-400 text-xs mb-4 font-mono">
+          $ ls -la /security/modules
+        </div>
+
+        <ul className="space-y-1">
           {navItems.map((item, index) => {
             const isActive = pathname === item.href;
+
             return (
               <motion.li
                 key={item.href}
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                transition={{ duration: 0.2, delay: index * 0.05 }}
               >
                 {item.onClick ? (
                   <button
                     onClick={item.onClick}
-                    className={`group flex items-center p-3 rounded-lg transition-all duration-200 w-full text-left ${
+                    className={`group flex items-center justify-between p-3 rounded border transition-all duration-200 w-full text-left ${
                       isActive
-                        ? "bg-app-primary-200 text-app-primary border border-app-primary-300 shadow-sm"
-                        : "text-app-text-700 hover:text-app-text hover:bg-app-primary-100"
+                        ? "bg-blue-500/20 border-blue-500/40 text-blue-300"
+                        : "border-slate-700/50 text-slate-300 hover:bg-slate-800/50 hover:border-slate-600/50 hover:text-slate-200"
                     }`}
                   >
-                    <span
-                      className={`mr-3 transition-transform duration-200 group-hover:scale-110 ${
-                        isActive ? "text-app-primary" : ""
-                      }`}
-                    >
-                      {item.icon}
-                    </span>
-                    <span className="font-medium">{item.label}</span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="ml-auto w-2 h-2 bg-app-primary rounded-full"
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
-                        }}
-                      />
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <span
+                        className={`${
+                          isActive ? "text-blue-400" : "text-slate-400"
+                        } group-hover:text-slate-300`}
+                      >
+                        {item.icon}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className={`text-xs font-semibold ${
+                            isActive ? "text-blue-300" : "text-slate-300"
+                          }`}
+                        >
+                          {item.label}
+                        </div>
+                        <div className="text-xs text-slate-500 truncate">
+                          $ {item.command}
+                        </div>
+                      </div>
+                    </div>
+
+                    {item.status && (
+                      <div className="flex items-center gap-1">
+                        {getStatusDot(item.status)}
+                        <span
+                          className={`text-xs ${getStatusColor(item.status)}`}
+                        >
+                          {item.status}
+                        </span>
+                      </div>
                     )}
                   </button>
                 ) : (
                   <Link
                     href={item.href}
-                    className={`group flex items-center p-3 rounded-lg transition-all duration-200 ${
+                    className={`group flex items-center justify-between p-3 rounded border transition-all duration-200 w-full text-left ${
                       isActive
-                        ? "bg-app-primary-200 text-app-primary border border-app-primary-300 shadow-sm"
-                        : "text-app-text-700 hover:text-app-text hover:bg-app-primary-100"
+                        ? "bg-blue-500/20 border-blue-500/40 text-blue-300"
+                        : "border-slate-700/50 text-slate-300 hover:bg-slate-800/50 hover:border-slate-600/50 hover:text-slate-200"
                     }`}
                   >
-                    <span
-                      className={`mr-3 transition-transform duration-200 group-hover:scale-110 ${
-                        isActive ? "text-app-primary" : ""
-                      }`}
-                    >
-                      {item.icon}
-                    </span>
-                    <span className="font-medium">{item.label}</span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="ml-auto w-2 h-2 bg-app-primary rounded-full"
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
-                        }}
-                      />
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <span
+                        className={`${
+                          isActive ? "text-blue-400" : "text-slate-400"
+                        } group-hover:text-slate-300`}
+                      >
+                        {item.icon}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className={`text-xs font-semibold ${
+                            isActive ? "text-blue-300" : "text-slate-300"
+                          }`}
+                        >
+                          {item.label}
+                        </div>
+                        <div className="text-xs text-slate-500 truncate">
+                          $ {item.command}
+                        </div>
+                      </div>
+                    </div>
+
+                    {item.status && (
+                      <div className="flex items-center gap-1">
+                        {getStatusDot(item.status)}
+                        <span
+                          className={`text-xs ${getStatusColor(item.status)}`}
+                        >
+                          {item.status}
+                        </span>
+                      </div>
                     )}
                   </Link>
                 )}
@@ -241,6 +368,13 @@ export default function Sidebar() {
           })}
         </ul>
       </nav>
+
+      {/* Terminal Footer */}
+      <div className="border-t border-slate-800/50 p-4">
+        <div className="text-xs text-slate-400 text-center">
+          Terminal Ready • All Systems Operational
+        </div>
+      </div>
     </motion.aside>
   );
 }
