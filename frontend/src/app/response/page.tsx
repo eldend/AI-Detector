@@ -182,15 +182,100 @@ export default function ResponsePage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-app-background flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center relative">
+        {/* Tech Grid Background */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+
+        {/* 3D Floating Bubbles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute w-72 h-72 rounded-full opacity-30"
+            style={{
+              background:
+                "radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.1) 50%, transparent 70%)",
+              left: "10%",
+              top: "15%",
+              animation: "float 20s ease-in-out infinite",
+              zIndex: -1,
+            }}
+          ></div>
+          <div
+            className="absolute w-96 h-96 rounded-full opacity-25"
+            style={{
+              background:
+                "radial-gradient(circle at 25% 25%, rgba(168, 85, 247, 0.35) 0%, rgba(168, 85, 247, 0.1) 50%, transparent 70%)",
+              right: "5%",
+              top: "5%",
+              animation: "float 25s ease-in-out infinite reverse",
+              zIndex: -1,
+            }}
+          ></div>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
+          className="relative z-10 w-full max-w-md"
         >
-          <div className="w-16 h-16 border-4 border-app-primary-200 border-t-app-primary rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-app-text">대응 시스템 로딩 중...</p>
+          {/* Terminal Loading Window */}
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-lg border border-slate-700/50 overflow-hidden">
+            {/* Terminal Header */}
+            <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/70 border-b border-slate-700/50">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div className="flex-1 text-center">
+                <span className="text-slate-400 text-sm font-mono">
+                  response-system.terminal
+                </span>
+              </div>
+            </div>
+
+            {/* Terminal Content */}
+            <div className="p-6">
+              <div className="text-green-400 font-mono text-sm mb-4">
+                $ response-system --init --load-protocols
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-4 h-4 border-2 border-blue-400/50 border-t-blue-400 rounded-full animate-spin"></div>
+                <span className="text-slate-300 font-mono text-sm">
+                  대응 시스템 로딩 중...
+                </span>
+              </div>
+              <div className="space-y-2 text-xs font-mono">
+                <div className="text-slate-400">
+                  ✓ Loading incident response protocols
+                </div>
+                <div className="text-slate-400">
+                  ✓ Initializing threat mitigation
+                </div>
+                <div className="text-blue-400 animate-pulse">
+                  → Connecting to security APIs...
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
+
+        <style jsx>{`
+          @keyframes float {
+            0%,
+            100% {
+              transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+              transform: translate(30px, -30px) rotate(1deg);
+            }
+            50% {
+              transform: translate(-20px, 20px) rotate(-1deg);
+            }
+            75% {
+              transform: translate(20px, -10px) rotate(0.5deg);
+            }
+          }
+        `}</style>
       </div>
     );
   }

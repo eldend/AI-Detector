@@ -21,135 +21,406 @@ export default function SignupPage() {
     setError(null);
     setSuccess(null);
     if (password !== confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.");
+      setError("Password confirmation does not match.");
       return;
     }
     setLoading(true);
     try {
       await register({ username, password });
-      setSuccess(
-        "회원가입이 성공적으로 완료되었습니다. 로그인 페이지로 이동합니다."
-      );
+      setSuccess("Account creation successful. Redirecting to login...");
       setTimeout(() => {
         router.push("/login");
-      }, 2000); // 2초 후 로그인 페이지로 리다이렉트
+      }, 2000);
     } catch (err: any) {
-      setError(err.message || "회원가입 중 오류가 발생했습니다.");
+      setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-app-background p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white-900 backdrop-blur-md border border-app-accent-200 rounded-xl shadow-xl p-8 w-full max-w-md"
+    <div className="min-h-screen bg-slate-900 overflow-hidden relative">
+      {/* Tech Grid Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.03)_1px,transparent_1px)] bg-[size:72px_72px]"></div>
+
+        {/* 3D Floating Bubbles Background */}
+        {[
+          {
+            size: 320,
+            x: "8%",
+            y: "12%",
+            color: "rgba(59, 130, 246, 0.6)",
+            delay: 0,
+          },
+          {
+            size: 270,
+            x: "82%",
+            y: "68%",
+            color: "rgba(139, 92, 246, 0.5)",
+            delay: 2,
+          },
+          {
+            size: 190,
+            x: "2%",
+            y: "80%",
+            color: "rgba(236, 72, 153, 0.4)",
+            delay: 4,
+          },
+          {
+            size: 300,
+            x: "88%",
+            y: "18%",
+            color: "rgba(34, 197, 94, 0.3)",
+            delay: 6,
+          },
+          {
+            size: 160,
+            x: "45%",
+            y: "5%",
+            color: "rgba(251, 191, 36, 0.5)",
+            delay: 8,
+          },
+        ].map((bubble, i) => (
+          <motion.div
+            key={`signup-bubble-${i}`}
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: `${bubble.size}px`,
+              height: `${bubble.size}px`,
+              left: bubble.x,
+              top: bubble.y,
+              background: `radial-gradient(circle at 25% 25%, ${
+                bubble.color
+              } 0%, ${bubble.color.replace(
+                "0.",
+                "0.2"
+              )} 40%, ${bubble.color.replace(
+                /0\.\d/,
+                "0.1"
+              )} 70%, transparent 85%)`,
+              filter: "brightness(1.3) blur(0.8px)",
+              zIndex: -1,
+            }}
+            animate={{
+              y: [-22, 22, -22],
+              x: [-16, 16, -16],
+              scale: [1, 1.06, 1],
+            }}
+            transition={{
+              duration: Math.random() * 7 + 9,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: bubble.delay,
+            }}
+          >
+            {/* 3D highlight effect */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: "60%",
+                height: "60%",
+                top: "15%",
+                left: "15%",
+                background: `radial-gradient(circle at 20% 20%, ${bubble.color.replace(
+                  /0\.\d/,
+                  "0.8"
+                )} 0%, transparent 60%)`,
+                filter: "blur(2px)",
+              }}
+            ></div>
+
+            {/* Inner core glow */}
+            <div
+              className="absolute rounded-full animate-pulse"
+              style={{
+                width: "30%",
+                height: "30%",
+                top: "20%",
+                left: "20%",
+                background: `radial-gradient(circle, ${bubble.color.replace(
+                  /0\.\d/,
+                  "1"
+                )} 0%, transparent 70%)`,
+                filter: "blur(1px)",
+              }}
+            ></div>
+
+            {/* Natural glass reflection */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: "18%",
+                height: "18%",
+                top: "15%",
+                left: "20%",
+                background:
+                  "radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.08) 40%, transparent 70%)",
+                filter: "blur(0.8px)",
+              }}
+            ></div>
+          </motion.div>
+        ))}
+
+        {/* Network Nodes */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={`signup-node-${i}`}
+            className="absolute w-2 h-2 bg-violet-400/20 rounded-full border border-violet-400/40"
+            initial={{
+              x:
+                Math.random() *
+                (typeof window !== "undefined" ? window.innerWidth : 1920),
+              y:
+                Math.random() *
+                (typeof window !== "undefined" ? window.innerHeight : 1080),
+            }}
+            animate={{
+              x:
+                Math.random() *
+                (typeof window !== "undefined" ? window.innerWidth : 1920),
+              y:
+                Math.random() *
+                (typeof window !== "undefined" ? window.innerHeight : 1080),
+            }}
+            transition={{
+              duration: Math.random() * 22 + 18,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "linear",
+            }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-violet-400/10 rounded-full"
+              animate={{
+                scale: [1, 2.5, 1],
+                opacity: [0.5, 0, 0.5],
+              }}
+              transition={{
+                duration: 3.5,
+                repeat: Infinity,
+                delay: i * 0.6,
+              }}
+            />
+          </motion.div>
+        ))}
+
+        {/* Gradient overlays */}
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-violet-500/5 via-transparent to-blue-500/5"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-slate-900/50 via-transparent to-slate-900/50"></div>
+      </div>
+
+      {/* Navigation */}
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="fixed top-0 left-0 right-0 z-50 p-6 backdrop-blur-xl bg-slate-900/70 border-b border-slate-800/50"
       >
-        <h2 className="text-3xl font-bold text-center mb-6 text-app-primary">
-          AI Detector 회원가입
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="username"
-              className="block text-app-text text-sm font-semibold mb-2"
-            >
-              사용자 이름
-            </label>
-            <input
-              type="text"
-              id="username"
-              className="input-field w-full"
-              placeholder="사용자 이름을 입력하세요"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-app-text text-sm font-semibold mb-2"
-            >
-              비밀번호
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="input-field w-full"
-              placeholder="비밀번호를 입력하세요"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              htmlFor="confirmPassword"
-              className="block text-app-text text-sm font-semibold mb-2"
-            >
-              비밀번호 확인
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              className="input-field w-full"
-              placeholder="비밀번호를 다시 입력하세요"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && (
-            <motion.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-red-600 text-center text-sm mb-4 bg-red-50 border border-red-200 rounded-md p-2"
-            >
-              {error}
-            </motion.p>
-          )}
-          {success && (
-            <motion.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-green-600 text-center text-sm mb-4 bg-green-50 border border-green-200 rounded-md p-2"
-            >
-              {success}
-            </motion.p>
-          )}
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="flex items-center gap-3"
+          >
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-mono text-sm font-bold">AI</span>
+            </div>
+            <span className="text-xl font-mono font-bold text-white">
+              AI Detector
+            </span>
+          </motion.div>
+          <div className="flex gap-3">
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              className="btn bg-app-primary hover:bg-app-primary-700 text-white w-full py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
-              disabled={loading}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push("/")}
+              className="px-4 py-2 rounded-lg font-mono text-sm border border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200"
             >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  회원가입 중...
-                </div>
-              ) : (
-                "회원가입"
-              )}
+              Home
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push("/login")}
+              className="px-4 py-2 rounded-lg font-mono text-sm bg-gradient-to-r from-blue-500 to-violet-500 text-white hover:from-blue-600 hover:to-violet-600 transition-all duration-200"
+            >
+              Login
             </motion.button>
           </div>
-          <p className="text-center text-app-secondary text-sm mt-6">
-            이미 계정이 있으신가요?
-            <Link
-              href="/login"
-              className="text-app-primary hover:text-app-primary-700 font-medium hover:underline ml-1 transition-colors"
-            >
-              로그인
-            </Link>
-          </p>
-        </form>
-      </motion.div>
-    </main>
+        </div>
+      </motion.nav>
+
+      {/* Signup Form */}
+      <main className="min-h-screen flex items-center justify-center p-6 pt-24">
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="relative w-full max-w-md"
+        >
+          {/* Terminal Window */}
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-lg border border-slate-700/50 overflow-hidden">
+            {/* Terminal Header */}
+            <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/70 border-b border-slate-700/50">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div className="flex-1 text-center">
+                <span className="text-slate-400 text-sm font-mono">
+                  ai-detector-register.terminal
+                </span>
+              </div>
+            </div>
+
+            {/* Terminal Content */}
+            <div className="p-6">
+              {/* Terminal Prompt */}
+              <div className="mb-6">
+                <div className="text-green-400 font-mono text-sm mb-1">
+                  $ ai-detector --register --new-user
+                </div>
+                <div className="text-slate-400 font-mono text-xs mb-4">
+                  Creating new security endpoint registration...
+                </div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20"
+                >
+                  <div className="w-2 h-2 bg-violet-500 rounded-full animate-pulse"></div>
+                  <span className="text-violet-400 text-xs font-mono">
+                    Registration Active
+                  </span>
+                </motion.div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-slate-300 text-sm font-mono mb-2">
+                    <span className="text-blue-400">user@</span>new-endpoint:
+                  </label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white font-mono text-sm placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all duration-200"
+                    placeholder="Create username"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 text-sm font-mono mb-2">
+                    <span className="text-violet-400">auth@</span>password:
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white font-mono text-sm placeholder-slate-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition-all duration-200"
+                    placeholder="Create secure password"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 text-sm font-mono mb-2">
+                    <span className="text-green-400">verify@</span>password:
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white font-mono text-sm placeholder-slate-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all duration-200"
+                    placeholder="Confirm password"
+                    required
+                  />
+                </div>
+
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg"
+                  >
+                    <div className="text-red-400 font-mono text-sm">
+                      <span className="text-red-500">ERROR:</span> {error}
+                    </div>
+                  </motion.div>
+                )}
+
+                {success && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg"
+                  >
+                    <div className="text-green-400 font-mono text-sm">
+                      <span className="text-green-500">SUCCESS:</span> {success}
+                    </div>
+                  </motion.div>
+                )}
+
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={loading}
+                  className="group relative w-full px-6 py-3 bg-gradient-to-r from-violet-500 to-blue-500 rounded-lg font-mono font-medium text-white overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="relative z-10">
+                    {loading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Registering...
+                      </div>
+                    ) : (
+                      "Initialize Account →"
+                    )}
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </motion.button>
+
+                <div className="pt-4 border-t border-slate-700/50">
+                  <div className="text-slate-400 font-mono text-xs text-center">
+                    <span className="text-slate-500">user@system:</span> Already
+                    have access?
+                    <Link
+                      href="/login"
+                      className="text-violet-400 hover:text-violet-300 ml-1 hover:underline transition-colors"
+                    >
+                      authenticate-existing
+                    </Link>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* Floating Effects */}
+          <motion.div
+            animate={{ y: [-12, 12, -12] }}
+            transition={{
+              duration: 4.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-r from-violet-500/20 to-blue-500/20 rounded-full blur-xl"
+          ></motion.div>
+          <motion.div
+            animate={{ y: [12, -12, 12] }}
+            transition={{
+              duration: 3.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute -bottom-4 -left-4 w-24 h-24 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-full blur-xl"
+          ></motion.div>
+        </motion.div>
+      </main>
+    </div>
   );
 }

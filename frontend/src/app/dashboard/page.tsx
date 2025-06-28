@@ -1,33 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Responsive, WidthProvider } from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import { useDashboard } from "@/context/DashboardContext";
+import { useAuth } from "@/context/AuthContext";
+import DashboardLayout from "@/components/DashboardLayout";
 import StatCard from "@/components/StatCard";
-import EventTable from "@/components/EventTable";
-import EventDetail from "@/components/EventDetail";
 import TimeSeriesChart from "@/components/TimeSeriesChart";
 import DonutChart from "@/components/DonutChart";
+import EventTable from "@/components/EventTable";
+import EventDetail from "@/components/EventDetail";
 import BarChart from "@/components/BarChart";
 import HeatMap from "@/components/HeatMap";
 import DashboardSettings from "@/components/DashboardSettings";
-import { Event, EventDetail as EventDetailType, Stats } from "@/types/event";
-import { fetchEvents, fetchEventDetail, fetchStats } from "@/lib/api";
-import DashboardLayout from "@/components/DashboardLayout";
-import { useAuth } from "@/context/AuthContext";
-import { DashboardProvider, useDashboard } from "@/context/DashboardContext";
-
-// Import CSS for react-grid-layout
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
+import { fetchEvents, fetchStats } from "@/lib/api";
+import { Event, Stats, EventDetail as EventDetailType } from "@/types/event";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-function DashboardContent() {
+const defaultLayouts = {
+  lg: [
+    { i: "stat1", x: 0, y: 0, w: 3, h: 2 },
+    { i: "stat2", x: 3, y: 0, w: 3, h: 2 },
+    { i: "stat3", x: 6, y: 0, w: 3, h: 2 },
+    { i: "stat4", x: 9, y: 0, w: 3, h: 2 },
+    { i: "timeseries", x: 0, y: 2, w: 8, h: 4 },
+    { i: "donut", x: 8, y: 2, w: 4, h: 4 },
+    { i: "bar", x: 0, y: 6, w: 6, h: 4 },
+    { i: "heatmap", x: 6, y: 6, w: 6, h: 4 },
+    { i: "events", x: 0, y: 10, w: 12, h: 5 },
+  ],
+};
+
+// Event를 EventDetail로 변환하는 함수
+function convertEventToEventDetail(event: Event): EventDetailType {
+  return {
+    id: event.id,
+    date: new Date(event.timestamp).toLocaleString(),
+    anomalyScore: event.anomaly,
+    incident: `Security event detected: ${event.event} by user ${event.user}. ${
+      event.label === "Anomaly"
+        ? "This activity has been flagged as anomalous and requires investigation."
+        : "This appears to be normal activity."
+    }`,
+    rowData: {
+      ip_address: "192.168.1." + (Math.floor(Math.random() * 254) + 1),
+      user: event.user,
+      number: event.id.toString(),
+      location: "Unknown",
+      timestamp: event.timestamp,
+      event_type: event.event,
+      anomaly_score: event.anomaly.toFixed(3),
+      status: event.label,
+    },
+  };
+}
+
+export default function Dashboard() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<EventDetailType | null>(
-    null
-  );
   const [stats, setStats] = useState<Stats>({
     totalEvents: 0,
     anomalies: 0,
@@ -36,503 +71,473 @@ function DashboardContent() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const { isLoggedIn, logout, isLoading } = useAuth();
-  const { widgets, updateWidgetPosition, deleteWidget, toggleWidget } =
-    useDashboard();
+  const { currentUser, logout } = useAuth();
   const router = useRouter();
+  const { widgets } = useDashboard();
 
+  // Load data on mount (without auto-refresh)
   useEffect(() => {
-    if (!isLoading && !isLoggedIn) {
-      router.push("/login");
-    }
-  }, [isLoading, isLoggedIn, router]);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [eventsData, statsData] = await Promise.all([
+          fetchEvents(),
+          fetchStats(),
+        ]);
+        setEvents(eventsData);
+        setStats(statsData);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to load data:", err);
+        setError("Failed to load security data");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const loadData = async () => {
-    if (!isLoggedIn) return;
-    try {
-      setLoading(true);
-      const [eventsData, statsData] = await Promise.all([
-        fetchEvents(),
-        fetchStats(),
-      ]);
+    loadData();
+  }, []);
 
-      setEvents(eventsData);
-      setStats(statsData);
-      setError(null);
-    } catch (err) {
-      setError("데이터를 불러오는데 실패했습니다.");
-      console.error("Error loading data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Debug: 위젯 정보 출력
   useEffect(() => {
-    if (isLoggedIn) {
-      loadData();
-    }
-  }, [isLoggedIn]);
-
-  const handleEventSelect = async (eventId: number) => {
-    try {
-      const eventDetail = await fetchEventDetail(eventId);
-      setSelectedEvent(eventDetail);
-    } catch (err) {
-      console.error("Error loading event detail:", err);
-      setError("이벤트 상세 정보를 불러오는데 실패했습니다.");
-    }
-  };
+    console.log("Current widgets:", widgets);
+    console.log("Events:", events.length);
+    console.log("Stats:", stats);
+  }, [widgets, events, stats]);
 
   const handleLogout = () => {
     logout();
     router.push("/login");
   };
 
-  const handleDeleteWidget = (widgetId: string) => {
-    deleteWidget(widgetId);
+  const handleOpenSettings = () => {
+    setIsSettingsOpen(true);
   };
 
-  // Prepare chart data from events
-  const chartData = events.map((event) => ({
-    timestamp: event.timestamp,
-    anomalyScore: event.anomaly,
-    label: event.label,
-  }));
+  const handleEventClick = useCallback((event: Event) => {
+    setSelectedEvent(event);
+  }, []);
 
-  // Calculate normal vs anomaly counts
-  const normalCount = events.filter((event) => event.label === "Normal").length;
-  const anomalyCount = events.filter(
-    (event) => event.label === "Anomaly"
-  ).length;
+  // 실제 위젯 데이터로부터 레이아웃 생성 (메모이제이션)
+  const currentLayout = useMemo(() => {
+    return widgets
+      .filter((widget) => widget.visible)
+      .map((widget) => ({
+        i: widget.id,
+        x: widget.position.x,
+        y: widget.position.y,
+        w: widget.position.w,
+        h: widget.position.h,
+      }));
+  }, [widgets]);
 
-  // Prepare bar chart data (user-based)
-  const userStats = events.reduce((acc, event) => {
-    if (!acc[event.user]) {
-      acc[event.user] = { user: event.user, anomalyCount: 0, normalCount: 0 };
-    }
-    if (event.label === "Anomaly") {
-      acc[event.user].anomalyCount++;
-    } else {
-      acc[event.user].normalCount++;
-    }
-    return acc;
-  }, {} as Record<string, { user: string; anomalyCount: number; normalCount: number }>);
+  // Calculate threat level (메모이제이션)
+  const threatData = useMemo(() => {
+    const threatLevel =
+      stats.anomalies > 10 ? "HIGH" : stats.anomalies > 5 ? "MEDIUM" : "LOW";
+    const threatColor =
+      threatLevel === "HIGH"
+        ? "text-red-400"
+        : threatLevel === "MEDIUM"
+        ? "text-yellow-400"
+        : "text-green-400";
+    return { threatLevel, threatColor };
+  }, [stats.anomalies]);
 
-  const barChartData = Object.values(userStats);
+  // WidgetWrapper를 메모이제이션
+  const WidgetWrapper = useCallback(
+    ({ children, title, onRemove, widgetType }: any) => (
+      <div className="h-full bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-lg overflow-hidden font-mono relative z-0">
+        {/* Terminal Header */}
+        <div className="bg-slate-800/70 border-b border-slate-700/50 px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <span className="text-slate-400 text-sm ml-2">
+              {title}.terminal
+            </span>
+          </div>
+          <button
+            onClick={onRemove}
+            className="text-red-400 hover:text-red-300 transition-colors text-sm"
+          >
+            ✕
+          </button>
+        </div>
 
-  // Handle layout change
-  const handleLayoutChange = (layout: any) => {
-    layout.forEach((item: any) => {
-      updateWidgetPosition(item.i, {
-        x: item.x,
-        y: item.y,
-        w: item.w,
-        h: item.h,
-      });
-    });
-  };
+        {/* Terminal Command */}
+        <div className="px-4 py-1 bg-slate-800/30 border-b border-slate-700/30">
+          <div className="text-xs text-green-400">
+            $ {getTerminalCommand(widgetType)}
+          </div>
+        </div>
 
-  // Create layout from widgets with flexible sizing
-  const layout = widgets.map((widget) => ({
-    i: widget.id,
-    x: widget.position.x,
-    y: widget.position.y,
-    w: widget.position.w,
-    h: widget.position.h,
-    minW: 2,
-    minH: 2,
-    maxW: 12,
-    maxH: 12,
-  }));
+        {/* Widget Content */}
+        <div className="p-4 h-full overflow-hidden">{children}</div>
+      </div>
+    ),
+    []
+  );
 
-  // Filter visible widgets
-  const visibleWidgets = widgets.filter((widget) => widget.visible);
+  const getTerminalCommand = useCallback((type: string): string => {
+    const commands: Record<string, string> = {
+      stats: "monitor --stats --realtime",
+      timeseries: "plot --timeseries --anomaly-detection",
+      donutchart: "analyze --threat-distribution --pie-chart",
+      barchart: "analyze --bar-chart --category-breakdown",
+      heatmap: "visualize --heatmap --correlation-matrix",
+      eventtable:
+        "tail -f /var/log/security/events.log | grep -E 'ALERT|CRITICAL'",
+      eventdetail: "inspect --event-detail --forensics",
+    };
+    return commands[type] || "execute --widget";
+  }, []);
 
-  if (isLoading) {
-    return null;
-  }
+  // 각 위젯을 개별적으로 메모이제이션
+  const statsWidget = useMemo(
+    () =>
+      loading ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-green-400 font-mono text-sm animate-pulse">
+            Loading system metrics...
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-red-400 font-mono text-sm">Error: {error}</div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Events */}
+          <div className="bg-slate-800/30 rounded border border-slate-700/50 p-4 hover:bg-slate-800/50 transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 bg-blue-500/20 rounded border border-blue-500/30 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-blue-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  Total Events
+                </div>
+                <div className="text-blue-400 text-xl font-mono font-bold">
+                  {stats.totalEvents}
+                </div>
+              </div>
+            </div>
+            <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-500 rounded-full animate-pulse"
+                style={{ width: "100%" }}
+              ></div>
+            </div>
+          </div>
 
-  if (!isLoggedIn) {
-    return (
-      <main className="min-h-screen p-4 md:p-8 flex items-center justify-center">
-        <div className="text-xl">로그인이 필요합니다.</div>
-      </main>
-    );
-  }
+          {/* Anomalies */}
+          <div className="bg-slate-800/30 rounded border border-slate-700/50 p-4 hover:bg-slate-800/50 transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 bg-red-500/20 rounded border border-red-500/30 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-red-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  Anomalies
+                </div>
+                <div className="text-red-400 text-xl font-mono font-bold">
+                  {stats.anomalies}
+                </div>
+              </div>
+            </div>
+            <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-red-500 rounded-full animate-pulse"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    (stats.anomalies / stats.totalEvents) * 100
+                  )}%`,
+                }}
+              ></div>
+            </div>
+          </div>
 
-  if (error) {
-    return (
-      <main className="min-h-screen p-4 md:p-8 flex items-center justify-center">
-        <div className="text-xl text-danger">{error}</div>
-      </main>
-    );
-  }
+          {/* Average Score */}
+          <div className="bg-slate-800/30 rounded border border-slate-700/50 p-4 hover:bg-slate-800/50 transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 bg-yellow-500/20 rounded border border-yellow-500/30 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-yellow-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  Avg Score
+                </div>
+                <div className="text-yellow-400 text-xl font-mono font-bold">
+                  {stats.avgAnomaly.toFixed(3)}
+                </div>
+              </div>
+            </div>
+            <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-yellow-500 rounded-full animate-pulse"
+                style={{ width: `${stats.avgAnomaly * 100}%` }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Threat Level */}
+          <div className="bg-slate-800/30 rounded border border-slate-700/50 p-4 hover:bg-slate-800/50 transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <div
+                className={`w-8 h-8 ${
+                  threatData.threatLevel === "HIGH"
+                    ? "bg-red-500/20 border-red-500/30"
+                    : threatData.threatLevel === "MEDIUM"
+                    ? "bg-yellow-500/20 border-yellow-500/30"
+                    : "bg-green-500/20 border-green-500/30"
+                } rounded border flex items-center justify-center`}
+              >
+                <svg
+                  className={`w-4 h-4 ${
+                    threatData.threatLevel === "HIGH"
+                      ? "text-red-400"
+                      : threatData.threatLevel === "MEDIUM"
+                      ? "text-yellow-400"
+                      : "text-green-400"
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  Threat Level
+                </div>
+                <div
+                  className={`text-xl font-mono font-bold ${threatData.threatColor}`}
+                >
+                  {threatData.threatLevel}
+                </div>
+              </div>
+            </div>
+            <div className="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full animate-pulse ${
+                  threatData.threatLevel === "HIGH"
+                    ? "bg-red-500"
+                    : threatData.threatLevel === "MEDIUM"
+                    ? "bg-yellow-500"
+                    : "bg-green-500"
+                }`}
+                style={{
+                  width: `${
+                    threatData.threatLevel === "HIGH"
+                      ? 100
+                      : threatData.threatLevel === "MEDIUM"
+                      ? 60
+                      : 30
+                  }%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      ),
+    [loading, error, stats, threatData]
+  );
+
+  const eventTableWidget = useMemo(
+    () =>
+      loading ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-green-400 font-mono text-sm animate-pulse">
+            Loading events...
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-red-400 font-mono text-sm">Error: {error}</div>
+        </div>
+      ) : (
+        <EventTable events={events} onEventSelect={handleEventClick} />
+      ),
+    [loading, error, events, handleEventClick]
+  );
+
+  const eventDetailWidget = useMemo(
+    () =>
+      selectedEvent ? (
+        <EventDetail event={convertEventToEventDetail(selectedEvent)} />
+      ) : (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-slate-500 text-4xl mb-4">◯</div>
+            <div className="text-slate-400 text-sm mb-2">No Event Selected</div>
+            <div className="text-slate-500 text-xs">
+              Click on an event in the table to view details
+            </div>
+          </div>
+        </div>
+      ),
+    [selectedEvent]
+  );
+
+  const renderWidget = useCallback(
+    (widget: any) => {
+      switch (widget.type) {
+        case "stats":
+          return (
+            <WidgetWrapper
+              title="system-monitor"
+              onRemove={() => console.log("Remove widget:", widget.id)}
+              widgetType="stats"
+            >
+              {statsWidget}
+            </WidgetWrapper>
+          );
+        case "timeseries":
+          return (
+            <WidgetWrapper
+              title="anomaly-detection"
+              onRemove={() => console.log("Remove widget:", widget.id)}
+              widgetType="timeseries"
+            >
+              <TimeSeriesChart />
+            </WidgetWrapper>
+          );
+        case "donutchart":
+          return (
+            <WidgetWrapper
+              title="threat-analysis"
+              onRemove={() => console.log("Remove widget:", widget.id)}
+              widgetType="donutchart"
+            >
+              <DonutChart />
+            </WidgetWrapper>
+          );
+        case "barchart":
+          return (
+            <WidgetWrapper
+              title="category-breakdown"
+              onRemove={() => console.log("Remove widget:", widget.id)}
+              widgetType="barchart"
+            >
+              <BarChart />
+            </WidgetWrapper>
+          );
+        case "heatmap":
+          return (
+            <WidgetWrapper
+              title="correlation-matrix"
+              onRemove={() => console.log("Remove widget:", widget.id)}
+              widgetType="heatmap"
+            >
+              <HeatMap />
+            </WidgetWrapper>
+          );
+        case "eventtable":
+          return (
+            <WidgetWrapper
+              title="security-events"
+              onRemove={() => console.log("Remove widget:", widget.id)}
+              widgetType="eventtable"
+            >
+              {eventTableWidget}
+            </WidgetWrapper>
+          );
+        case "eventdetail":
+          return (
+            <WidgetWrapper
+              title="event-forensics"
+              onRemove={() => console.log("Remove widget:", widget.id)}
+              widgetType="eventdetail"
+            >
+              {eventDetailWidget}
+            </WidgetWrapper>
+          );
+        default:
+          return null;
+      }
+    },
+    [statsWidget, eventTableWidget, eventDetailWidget]
+  );
 
   return (
     <DashboardLayout
       onLogout={handleLogout}
-      onOpenSettings={() => setIsSettingsOpen(true)}
+      onOpenSettings={handleOpenSettings}
     >
-      <DashboardSettings
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
-
-      <div className="dashboard-grid-container">
+      <div className="h-full relative z-10">
+        {/* Grid Layout */}
         <ResponsiveGridLayout
           className="layout"
-          layouts={{ lg: layout }}
+          layouts={{ lg: currentLayout }}
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
           rowHeight={60}
-          onLayoutChange={handleLayoutChange}
+          onLayoutChange={() => {}}
           isDraggable={true}
           isResizable={true}
           margin={[16, 16]}
-          containerPadding={[0, 0]}
-          useCSSTransforms={true}
-          draggableCancel=".no-drag"
         >
-          {visibleWidgets.map((widget) => {
-            switch (widget.type) {
-              case "stats":
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <div className="card h-full p-4">
-                      <h3 className="text-lg font-semibold text-app-text mb-4">
-                        {widget.config?.title || "시스템 통계"}
-                      </h3>
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <StatCard
-                          title="Total Event"
-                          value={stats.totalEvents.toString()}
-                          icon="network"
-                          color="blue"
-                        />
-                        <StatCard
-                          title="Anomalies"
-                          value={stats.anomalies.toString()}
-                          icon="warning"
-                          color="purple"
-                        />
-                        <StatCard
-                          title="Average Anomaly"
-                          value={stats.avgAnomaly.toFixed(2)}
-                          icon="chart"
-                          color="cyan"
-                        />
-                        <StatCard
-                          title="Highest Score"
-                          value={stats.highestScore.toFixed(2)}
-                          icon="monitor"
-                          color="red"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-
-              case "timeseries":
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <TimeSeriesChart
-                      data={chartData}
-                      title={widget.config?.title}
-                      color={widget.config?.color}
-                    />
-                  </div>
-                );
-
-              case "eventtable":
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <div className="card h-full flex flex-col">
-                      <h2 className="text-xl font-semibold mb-4 px-6 pt-6">
-                        {widget.config?.title || "이벤트 로그"}
-                      </h2>
-                      <div className="flex-1 min-h-0 mx-6 mb-6 border border-app-accent-200 rounded-lg overflow-hidden no-drag">
-                        <div className="h-full overflow-y-auto">
-                          <EventTable
-                            events={events}
-                            onEventSelect={handleEventSelect}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-
-              case "donutchart":
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <DonutChart
-                      normalCount={normalCount}
-                      anomalyCount={anomalyCount}
-                      title={widget.config?.title}
-                    />
-                  </div>
-                );
-
-              case "barchart":
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <BarChart
-                      data={barChartData}
-                      title={widget.config?.title}
-                      color={widget.config?.color}
-                    />
-                  </div>
-                );
-
-              case "heatmap":
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <HeatMap title={widget.config?.title} />
-                  </div>
-                );
-
-              case "eventdetail":
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <EventDetail
-                      event={selectedEvent}
-                      title={widget.config?.title}
-                    />
-                  </div>
-                );
-
-              default:
-                return (
-                  <div
-                    key={widget.id}
-                    className="widget-container relative group"
-                  >
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteWidget(widget.id);
-                      }}
-                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 no-drag"
-                      title="위젯 삭제"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    <div className="card h-full flex items-center justify-center">
-                      <p className="text-app-secondary">
-                        알 수 없는 위젯 타입: {widget.type}
-                      </p>
-                    </div>
-                  </div>
-                );
-            }
-          })}
+          {widgets
+            .filter((widget) => widget.visible)
+            .map((widget) => (
+              <div key={widget.id}>{renderWidget(widget)}</div>
+            ))}
         </ResponsiveGridLayout>
+
+        {/* Settings Modal */}
+        {isSettingsOpen && (
+          <DashboardSettings
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+          />
+        )}
       </div>
     </DashboardLayout>
-  );
-}
-
-export default function Dashboard() {
-  return (
-    <DashboardProvider>
-      <DashboardContent />
-    </DashboardProvider>
   );
 }
