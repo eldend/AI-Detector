@@ -37,12 +37,14 @@ export default function Sidebar() {
     icon: React.ReactNode;
     onClick?: (e: React.MouseEvent) => void;
     status?: string;
+    description?: string;
   }> = [
     {
       href: "/dashboard",
-      label: "Dashboard",
-      command: "dashboard --realtime",
+      label: "보안 대시보드",
+      command: "dashboard --overview",
       status: "ACTIVE",
+      description: "전체 보안 현황 모니터링",
       icon: (
         <svg
           className="h-4 w-4"
@@ -60,10 +62,33 @@ export default function Sidebar() {
       ),
     },
     {
+      href: "/agents",
+      label: "보안 에이전트",
+      command: "agent --monitor",
+      status: "ONLINE",
+      description: "엔드포인트 에이전트 관리",
+      icon: (
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+    },
+    {
       href: "/events",
-      label: "Event Logs",
+      label: "이벤트 로그",
       command: "tail -f events.log",
       status: "MONITORING",
+      description: "실시간 보안 이벤트 수집",
       icon: (
         <svg
           className="h-4 w-4"
@@ -81,10 +106,11 @@ export default function Sidebar() {
       ),
     },
     {
-      href: "/analysis",
-      label: "ML Analysis",
-      command: "analyze --ml-model",
-      status: "READY",
+      href: "/tracing",
+      label: "데이터 처리",
+      command: "trace --pipeline",
+      status: "PROCESSING",
+      description: "이벤트 트레이싱 변환",
       icon: (
         <svg
           className="h-4 w-4"
@@ -96,16 +122,61 @@ export default function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "/rules",
+      label: "탐지 규칙",
+      command: "rules --manage",
+      status: "LOADED",
+      description: "위협 탐지 규칙 관리",
+      icon: (
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "/analysis",
+      label: "AI 위협 분석",
+      command: "langgraph --analyze",
+      status: "READY",
+      description: "인공지능 기반 위협 분석",
+      icon: (
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
           />
         </svg>
       ),
     },
     {
       href: "/policy",
-      label: "Security Policy",
+      label: "보안 정책",
       command: "policy --configure",
       status: "LOADED",
+      description: "시스템 보안 정책 설정",
       icon: (
         <svg
           className="h-4 w-4"
@@ -124,9 +195,10 @@ export default function Sidebar() {
     },
     {
       href: "/response",
-      label: "Incident Response",
-      command: "incident --respond",
+      label: "자동 대응",
+      command: "response --auto",
       status: "STANDBY",
+      description: "위협 자동 차단 및 대응",
       icon: (
         <svg
           className="h-4 w-4"
@@ -138,16 +210,17 @@ export default function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            d="M13 10V3L4 14h7v7l9-11h-7z"
           />
         </svg>
       ),
     },
     {
       href: "/settings",
-      label: "System Config",
-      command: "config --edit",
+      label: "시스템 설정",
+      command: "config --system",
       status: "IDLE",
+      description: "시스템 환경 설정",
       icon: (
         <svg
           className="h-4 w-4"
@@ -176,16 +249,22 @@ export default function Sidebar() {
     switch (status) {
       case "ACTIVE":
         return "text-green-400";
+      case "ONLINE":
+        return "text-emerald-400";
       case "MONITORING":
         return "text-blue-400";
+      case "PROCESSING":
+        return "text-orange-400";
       case "READY":
         return "text-cyan-400";
       case "LOADED":
         return "text-violet-400";
       case "STANDBY":
         return "text-yellow-400";
-      default:
+      case "IDLE":
         return "text-slate-400";
+      default:
+        return "text-slate-500";
     }
   };
 
@@ -303,7 +382,12 @@ export default function Sidebar() {
                         >
                           {item.label}
                         </div>
-                        <div className="text-xs text-slate-500 truncate">
+                        {item.description && (
+                          <div className="text-xs text-slate-500 truncate mb-1">
+                            {item.description}
+                          </div>
+                        )}
+                        <div className="text-xs text-slate-600 font-mono truncate">
                           $ {item.command}
                         </div>
                       </div>
@@ -345,7 +429,12 @@ export default function Sidebar() {
                         >
                           {item.label}
                         </div>
-                        <div className="text-xs text-slate-500 truncate">
+                        {item.description && (
+                          <div className="text-xs text-slate-500 truncate mb-1">
+                            {item.description}
+                          </div>
+                        )}
+                        <div className="text-xs text-slate-600 font-mono truncate">
                           $ {item.command}
                         </div>
                       </div>
