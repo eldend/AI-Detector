@@ -229,7 +229,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
                   Total Events
                 </div>
                 <div className="text-blue-400 text-xl font-mono font-bold">
@@ -264,7 +264,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
                   Anomalies
                 </div>
                 <div className="text-red-400 text-xl font-mono font-bold">
@@ -304,7 +304,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
                   Avg Score
                 </div>
                 <div className="text-yellow-400 text-xl font-mono font-bold">
@@ -353,7 +353,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
                   Threat Level
                 </div>
                 <div

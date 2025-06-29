@@ -209,17 +209,25 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
                 {/* Status Badge */}
                 <div className="col-span-2 flex justify-center">
                   <span
-                    className={`px-2 py-1 rounded text-xs font-bold border ${
+                    className={`py-1 rounded text-xs font-bold border w-20 flex items-center justify-center ${
                       selectedEventId === event.id
-                        ? event.label === "Anomaly"
+                        ? event.anomaly > 0.7
                           ? "bg-red-500/40 border-red-400/70 text-red-200"
+                          : event.anomaly > 0.4
+                          ? "bg-yellow-500/40 border-yellow-400/70 text-yellow-200"
                           : "bg-green-500/40 border-green-400/70 text-green-200"
-                        : event.label === "Anomaly"
+                        : event.anomaly > 0.7
                         ? "bg-red-500/20 border-red-500/50 text-red-300"
+                        : event.anomaly > 0.4
+                        ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-300"
                         : "bg-green-500/20 border-green-500/50 text-green-300"
                     }`}
                   >
-                    {event.label === "Anomaly" ? "ALERT" : "NORMAL"}
+                    {event.anomaly > 0.7
+                      ? "ALERT"
+                      : event.anomaly > 0.4
+                      ? "WARNING"
+                      : "NORMAL"}
                   </span>
                 </div>
 
