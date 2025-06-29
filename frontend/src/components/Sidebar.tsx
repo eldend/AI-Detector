@@ -44,7 +44,7 @@ export default function Sidebar() {
       label: "보안 대시보드",
       command: "dashboard --overview",
       status: "ACTIVE",
-      description: "전체 보안 현황 모니터링",
+      description: "보안 현황을 한눈에 확인하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -63,10 +63,10 @@ export default function Sidebar() {
     },
     {
       href: "/agents",
-      label: "보안 에이전트",
+      label: "에이전트 관리",
       command: "agent --monitor",
       status: "ONLINE",
-      description: "엔드포인트 에이전트 관리",
+      description: "PC와 서버의 보안 상태를 관리하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -85,10 +85,10 @@ export default function Sidebar() {
     },
     {
       href: "/events",
-      label: "이벤트 로그",
+      label: "보안 이벤트",
       command: "tail -f events.log",
       status: "MONITORING",
-      description: "실시간 보안 이벤트 수집",
+      description: "발생한 보안 이벤트를 실시간으로 확인하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -110,7 +110,7 @@ export default function Sidebar() {
       label: "데이터 처리",
       command: "trace --pipeline",
       status: "PROCESSING",
-      description: "이벤트 트레이싱 변환",
+      description: "수집된 데이터를 분석 가능한 형태로 변환합니다",
       icon: (
         <svg
           className="h-4 w-4"
@@ -129,10 +129,10 @@ export default function Sidebar() {
     },
     {
       href: "/rules",
-      label: "탐지 규칙",
+      label: "위협 탐지 규칙",
       command: "rules --manage",
       status: "LOADED",
-      description: "위협 탐지 규칙 관리",
+      description: "어떤 상황을 위험으로 판단할지 설정하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -154,7 +154,7 @@ export default function Sidebar() {
       label: "AI 위협 분석",
       command: "langgraph --analyze",
       status: "READY",
-      description: "인공지능 기반 위협 분석",
+      description: "AI가 자동으로 위협을 분석하고 판단합니다",
       icon: (
         <svg
           className="h-4 w-4"
@@ -176,7 +176,7 @@ export default function Sidebar() {
       label: "보안 정책",
       command: "policy --configure",
       status: "LOADED",
-      description: "시스템 보안 정책 설정",
+      description: "시스템 전체의 보안 정책을 설정하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -198,7 +198,7 @@ export default function Sidebar() {
       label: "자동 대응",
       command: "response --auto",
       status: "STANDBY",
-      description: "위협 자동 차단 및 대응",
+      description: "위험한 상황을 자동으로 차단하고 대응합니다",
       icon: (
         <svg
           className="h-4 w-4"
@@ -220,7 +220,7 @@ export default function Sidebar() {
       label: "시스템 설정",
       command: "config --system",
       status: "IDLE",
-      description: "시스템 환경 설정",
+      description: "시스템 환경과 사용자 설정을 관리하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -307,9 +307,9 @@ export default function Sidebar() {
               <span className="text-white font-bold text-sm">AI</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">Security Control</h1>
+              <h1 className="text-lg font-bold text-white">AI 보안 시스템</h1>
               <p className="text-xs text-slate-400 -mt-1">
-                v2.1.3 | Build 2024.1
+                v2.1.3 | 실시간 보안 모니터링
               </p>
             </div>
           </div>
@@ -321,11 +321,11 @@ export default function Sidebar() {
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-400">ONLINE</span>
+              <span className="text-green-400">정상 운영</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-blue-400">SECURED</span>
+              <span className="text-blue-400">보안 유지</span>
             </div>
           </div>
           <div className="text-slate-500 text-xs mt-1">
@@ -343,7 +343,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-grow p-4">
         <div className="text-green-400 text-xs mb-4 font-mono">
-          $ ls -la /security/modules
+          $ 보안 모듈 목록 조회 중...
         </div>
 
         <ul className="space-y-1">
