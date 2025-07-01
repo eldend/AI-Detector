@@ -214,11 +214,12 @@ export default function TracingPage() {
   if (isLoading || loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center relative">
-        {/* Background animations */}
+        {/* 3D Bubbles Background */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full blur-xl animate-float"></div>
           <div className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-br from-purple-500/15 to-pink-500/15 rounded-full blur-xl animate-float-delay-1"></div>
           <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-br from-green-500/15 to-blue-500/15 rounded-full blur-xl animate-float-delay-2"></div>
+          <div className="absolute bottom-40 right-10 w-60 h-60 bg-gradient-to-br from-pink-500/20 to-yellow-500/20 rounded-full blur-xl animate-float-delay-3"></div>
         </div>
 
         <motion.div
@@ -226,8 +227,10 @@ export default function TracingPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="relative z-10 w-full max-w-md"
         >
+          {/* Terminal Loading Window */}
           <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/80 border-b border-slate-700/50">
+            {/* Terminal Header */}
+            <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/80 border border-slate-700/50">
               <div className="flex gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -235,32 +238,34 @@ export default function TracingPage() {
               </div>
               <div className="flex-1 text-center">
                 <span className="text-slate-400 text-sm font-mono">
-                  data-pipeline://otel-processor --init
+                  otel-processor://data-pipeline --initializing
                 </span>
               </div>
             </div>
+
+            {/* Terminal Content */}
             <div className="p-6">
               <div className="text-cyan-400 font-mono text-sm mb-4">
-                $ pipeline-monitor --status --otel-conversion
+                $ data-pipeline --otel-conversion --monitoring --realtime
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-4 h-4 border-2 border-cyan-500/50 border-t-cyan-500 rounded-full animate-spin"></div>
                 <span className="text-slate-300 font-mono text-sm">
-                  데이터 파이프라인 초기화 중...
+                  데이터 파이프라인 시스템 부팅 중...
                 </span>
               </div>
               <div className="space-y-2 text-xs font-mono">
                 <div className="text-slate-400">
-                  {">"} Initializing OTEL processor
+                  ✓ Loading OTEL processor modules
                 </div>
                 <div className="text-slate-400">
-                  {">"} Loading data transformation rules
+                  ✓ Initializing data transformation engine
                 </div>
                 <div className="text-slate-400">
-                  {">"} Starting pipeline monitors
+                  ✓ Starting pipeline monitoring services
                 </div>
                 <div className="text-cyan-400 animate-pulse">
-                  {">"} Connecting to agent data stream...
+                  ✓ Connecting to agent data streams...
                 </div>
               </div>
             </div>
@@ -280,11 +285,12 @@ export default function TracingPage() {
 
   return (
     <DashboardLayout onLogout={handleLogout} onOpenSettings={() => {}}>
-      {/* Background */}
+      {/* 3D Bubbles Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full blur-xl animate-float"></div>
         <div className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-br from-purple-500/15 to-pink-500/15 rounded-full blur-xl animate-float-delay-1"></div>
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-br from-green-500/15 to-blue-500/15 rounded-full blur-xl animate-float-delay-2"></div>
+        <div className="absolute bottom-40 right-10 w-60 h-60 bg-gradient-to-br from-pink-500/20 to-yellow-500/20 rounded-full blur-xl animate-float-delay-3"></div>
       </div>
 
       <div className="relative z-10 p-6 space-y-6">
@@ -294,23 +300,25 @@ export default function TracingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden"
         >
-          <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
+          {/* Terminal Header */}
+          <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/80 border border-slate-700/50">
             <div className="flex gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
-            <span className="text-slate-400 text-sm font-mono ml-2">
-              pipeline-monitor://otel-processing --realtime
-            </span>
+            <div className="flex-1 text-center">
+              <span className="text-slate-400 text-sm font-mono">
+                otel-processor://data-pipeline --monitoring --realtime
+              </span>
+            </div>
           </div>
 
-          <div className="p-4">
-            <div className="flex items-center gap-4 text-sm font-mono mb-4">
-              <span className="text-cyan-400">security@data-pipeline:~$</span>
-              <span className="text-slate-300">monitor --status --otel</span>
+          {/* Terminal Content */}
+          <div className="p-6">
+            <div className="text-cyan-400 font-mono text-sm mb-4">
+              $ data-pipeline --status --otel-conversion --monitoring
             </div>
-
             <div>
               <h1 className="text-2xl font-bold text-cyan-400 font-mono mb-2">
                 Data Processing Pipeline
@@ -669,7 +677,23 @@ export default function TracingPage() {
               </div>
 
               <div className="p-4 max-h-96 overflow-y-auto">
-                <div className="space-y-2">
+                <style jsx>{`
+                  .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-track {
+                    background: #1e293b;
+                    border-radius: 3px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #475569;
+                    border-radius: 3px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #64748b;
+                  }
+                `}</style>
+                <div className="space-y-2 custom-scrollbar">
                   {mockTracingData.recentLogs.map((log, index) => (
                     <motion.div
                       key={index}

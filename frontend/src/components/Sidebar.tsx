@@ -303,13 +303,13 @@ export default function Sidebar() {
         {/* Logo/Brand */}
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AI</span>
+            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded flex items-center justify-center">
+              <span className="text-white font-bold text-sm">X</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">AI 보안 시스템</h1>
+              <h1 className="text-lg font-bold text-white">ShiftX</h1>
               <p className="text-xs text-slate-400 -mt-1">
-                v2.1.3 | 실시간 보안 모니터링
+                v2.3.1 | Build 2024.3
               </p>
             </div>
           </div>
@@ -317,18 +317,18 @@ export default function Sidebar() {
 
         {/* System Status */}
         <div className="bg-slate-800/50 rounded border border-slate-700/50 p-2 mt-3">
-          <div className="text-xs text-slate-400 mb-1">SYSTEM STATUS</div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="text-xs text-slate-400 mb-2">SYSTEM STATUS</div>
+          <div className="grid grid-cols-2 gap-2 text-xs mb-2">
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-400">정상 운영</span>
+              <span className="text-green-400">ONLINE</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-blue-400">보안 유지</span>
+              <span className="text-blue-400">SECURED</span>
             </div>
           </div>
-          <div className="text-slate-500 text-xs mt-1">
+          <div className="text-slate-500 text-xs">
             {currentTime.toLocaleString("en-US", {
               hour12: false,
               month: "2-digit",
@@ -343,7 +343,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-grow p-4">
         <div className="text-green-400 text-xs mb-4 font-mono">
-          $ 보안 모듈 목록 조회 중...
+          $ ls -la /security/modules
         </div>
 
         <ul className="space-y-1">
@@ -382,11 +382,6 @@ export default function Sidebar() {
                         >
                           {item.label}
                         </div>
-                        {item.description && (
-                          <div className="text-xs text-slate-500 truncate mb-1">
-                            {item.description}
-                          </div>
-                        )}
                         <div className="text-xs text-slate-600 font-mono truncate">
                           $ {item.command}
                         </div>
@@ -429,11 +424,6 @@ export default function Sidebar() {
                         >
                           {item.label}
                         </div>
-                        {item.description && (
-                          <div className="text-xs text-slate-500 truncate mb-1">
-                            {item.description}
-                          </div>
-                        )}
                         <div className="text-xs text-slate-600 font-mono truncate">
                           $ {item.command}
                         </div>
