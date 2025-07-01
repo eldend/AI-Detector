@@ -222,11 +222,11 @@ export default function SignupPage() {
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-3"
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-mono text-sm font-bold">AI</span>
+            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-mono text-sm font-bold">X</span>
             </div>
             <span className="text-xl font-mono font-bold text-white">
-              AI Detector
+              ShiftX
             </span>
           </motion.div>
           <div className="flex gap-3">
@@ -269,7 +269,7 @@ export default function SignupPage() {
               </div>
               <div className="flex-1 text-center">
                 <span className="text-slate-400 text-sm font-mono">
-                  ai-detector-register.terminal
+                  shiftx-register.terminal
                 </span>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function SignupPage() {
               {/* Terminal Prompt */}
               <div className="mb-6">
                 <div className="text-green-400 font-mono text-sm mb-1">
-                  $ ai-detector --register --new-user
+                  $ shiftx --register --new-user
                 </div>
                 <div className="text-slate-400 font-mono text-xs mb-4">
                   Creating new security endpoint registration...

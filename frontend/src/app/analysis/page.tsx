@@ -6,94 +6,105 @@ import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 
-// Mock data for RAG + LangGraph Analysis
-const mockRAGData = {
-  vectorDatabase: {
-    documentsIndexed: 245892,
-    embeddingDimensions: 1536,
-    indexSize: "2.4GB",
-    queryLatency: 23.5,
-    retrievalAccuracy: 94.2,
-    chunkSize: 512,
+// Mock data for AI Threat Analysis
+const mockThreatData = {
+  threatAnalysis: {
+    totalThreats: 1247,
+    highRiskThreats: 89,
+    mediumRiskThreats: 312,
+    lowRiskThreats: 846,
+    aiAccuracy: 94.7,
+    processingTime: 1.2,
+    falsePositives: 3.1,
   },
-  retrievalMetrics: [
-    { time: "00:00", queries: 156, accuracy: 94.2, latency: 23.5 },
-    { time: "04:00", queries: 189, accuracy: 93.8, latency: 25.1 },
-    { time: "08:00", queries: 312, accuracy: 95.1, latency: 22.3 },
-    { time: "12:00", queries: 428, accuracy: 92.4, latency: 28.7 },
-    { time: "16:00", queries: 398, accuracy: 94.7, latency: 24.2 },
-    { time: "20:00", queries: 267, accuracy: 95.3, latency: 21.8 },
+  threatCategories: [
+    { category: "악성코드", count: 234, severity: "high", trend: "+12%" },
+    { category: "APT 공격", count: 67, severity: "critical", trend: "+8%" },
+    { category: "내부자 위협", count: 123, severity: "medium", trend: "-5%" },
+    { category: "피싱", count: 189, severity: "medium", trend: "+15%" },
+    { category: "DDoS", count: 45, severity: "high", trend: "-2%" },
+    { category: "랜섬웨어", count: 34, severity: "critical", trend: "+7%" },
   ],
-  langGraphWorkflows: [
+  aiInsights: [
     {
-      workflow: "Document Analysis",
-      status: "running",
-      executions: 1247,
-      successRate: 96.8,
-      avgDuration: 2.3,
+      insight: "새로운 APT 그룹의 공격 패턴 탐지",
+      confidence: 92.4,
+      riskLevel: "critical",
+      affectedSystems: 23,
+      timestamp: "2024-03-15 14:32:15",
     },
     {
-      workflow: "Q&A Processing",
-      status: "running",
-      executions: 892,
-      successRate: 94.2,
-      avgDuration: 1.8,
+      insight: "비정상적인 네트워크 트래픽 패턴",
+      confidence: 87.6,
+      riskLevel: "high",
+      affectedSystems: 8,
+      timestamp: "2024-03-15 14:15:42",
     },
     {
-      workflow: "Content Summarization",
-      status: "paused",
-      executions: 543,
-      successRate: 98.1,
-      avgDuration: 3.2,
+      insight: "권한 상승 시도 증가 추세",
+      confidence: 78.9,
+      riskLevel: "medium",
+      affectedSystems: 45,
+      timestamp: "2024-03-15 13:58:21",
     },
     {
-      workflow: "Multi-Agent Research",
-      status: "running",
-      executions: 678,
-      successRate: 91.5,
-      avgDuration: 4.7,
+      insight: "외부 IP에서 반복적인 접근 시도",
+      confidence: 95.1,
+      riskLevel: "high",
+      affectedSystems: 12,
+      timestamp: "2024-03-15 13:45:33",
     },
   ],
-  agentPerformance: [
+  realtimeAnalysis: [
     {
-      agent: "Retriever Agent",
-      cpu: 45.2,
-      memory: 2.1,
-      tasks: 234,
-      success: 97.3,
+      eventId: "TH-2024-031501",
+      source: "192.168.1.105",
+      target: "DC-Server-01",
+      threatType: "Lateral Movement",
+      severity: "high",
+      aiScore: 89.3,
+      status: "분석중",
+      timestamp: "14:35:22",
     },
     {
-      agent: "Generator Agent",
-      cpu: 78.4,
-      memory: 4.8,
-      tasks: 189,
-      success: 94.7,
+      eventId: "TH-2024-031502",
+      source: "외부-221.143.22.8",
+      target: "Web-Server-03",
+      threatType: "SQL Injection",
+      severity: "critical",
+      aiScore: 96.7,
+      status: "차단됨",
+      timestamp: "14:34:15",
     },
     {
-      agent: "Validator Agent",
-      cpu: 23.1,
-      memory: 1.2,
-      tasks: 156,
-      success: 99.1,
+      eventId: "TH-2024-031503",
+      source: "192.168.1.87",
+      target: "File-Server-02",
+      threatType: "Suspicious File Access",
+      severity: "medium",
+      aiScore: 73.2,
+      status: "모니터링",
+      timestamp: "14:33:08",
     },
-    {
-      agent: "Router Agent",
-      cpu: 12.8,
-      memory: 0.8,
-      tasks: 423,
-      success: 96.8,
-    },
+  ],
+  modelPerformance: [
+    { time: "00:00", accuracy: 94.2, processed: 156, blocked: 23 },
+    { time: "04:00", accuracy: 93.8, processed: 189, blocked: 31 },
+    { time: "08:00", accuracy: 95.1, processed: 312, blocked: 45 },
+    { time: "12:00", accuracy: 92.4, processed: 428, blocked: 67 },
+    { time: "16:00", accuracy: 94.7, processed: 398, blocked: 52 },
+    { time: "20:00", accuracy: 95.3, processed: 267, blocked: 38 },
   ],
 };
 
 export default function AnalysisPage() {
-  const [activeTab, setActiveTab] = useState("rag");
+  const [activeTab, setActiveTab] = useState("threatAnalysis");
   const [loading, setLoading] = useState(true);
   const [selectedMetric, setSelectedMetric] = useState("queries");
   const [realTimeData, setRealTimeData] = useState({
-    activeQueries: 0,
-    vectorOperations: 0,
-    workflowExecutions: 0,
+    activeThreats: 0,
+    aiAnalysisCount: 0,
+    blockedAttacks: 0,
   });
 
   const { isLoggedIn, logout, isLoading } = useAuth();
@@ -115,9 +126,9 @@ export default function AnalysisPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setRealTimeData({
-        activeQueries: Math.floor(Math.random() * 50) + 20,
-        vectorOperations: Math.floor(Math.random() * 200) + 100,
-        workflowExecutions: Math.floor(Math.random() * 15) + 5,
+        activeThreats: Math.floor(Math.random() * 50) + 20,
+        aiAnalysisCount: Math.floor(Math.random() * 200) + 100,
+        blockedAttacks: Math.floor(Math.random() * 15) + 5,
       });
     }, 2000);
 
@@ -130,10 +141,11 @@ export default function AnalysisPage() {
   };
 
   const tabs = [
-    { id: "rag", label: "RAG Performance" },
-    { id: "workflows", label: "LangGraph Workflows" },
-    { id: "agents", label: "Agent Orchestration" },
-    { id: "vectors", label: "Vector Database" },
+    { id: "threatAnalysis", label: "위협 분석 개요" },
+    { id: "threatCategories", label: "위협 카테고리" },
+    { id: "aiInsights", label: "AI 인사이트" },
+    { id: "realtimeAnalysis", label: "실시간 분석" },
+    { id: "modelPerformance", label: "모델 성능" },
   ];
 
   if (isLoading || loading) {
@@ -155,7 +167,7 @@ export default function AnalysisPage() {
           {/* Terminal Loading Window */}
           <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
             {/* Terminal Header */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/80 border-b border-slate-700/50">
+            <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/80 border border-slate-700/50">
               <div className="flex gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -163,7 +175,7 @@ export default function AnalysisPage() {
               </div>
               <div className="flex-1 text-center">
                 <span className="text-slate-400 text-sm font-mono">
-                  rag-engine://langgraph-monitor --initializing
+                  ai-threat-analyzer://security-monitor --initializing
                 </span>
               </div>
             </div>
@@ -171,26 +183,26 @@ export default function AnalysisPage() {
             {/* Terminal Content */}
             <div className="p-6">
               <div className="text-cyan-400 font-mono text-sm mb-4">
-                $ rag-analyzer --vectors --workflows --agents --real-time
+                $ threat-analyzer --ai-engine --real-time --monitoring
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-4 h-4 border-2 border-cyan-500/50 border-t-cyan-500 rounded-full animate-spin"></div>
                 <span className="text-slate-300 font-mono text-sm">
-                  RAG + LangGraph 시스템 부팅 중...
+                  AI 위협 분석 시스템 부팅 중...
                 </span>
               </div>
               <div className="space-y-2 text-xs font-mono">
                 <div className="text-slate-400">
-                  ✓ Loading vector database connections
+                  ✓ Loading threat detection models
                 </div>
                 <div className="text-slate-400">
-                  ✓ Initializing LangGraph workflows
+                  ✓ Initializing AI analysis engine
                 </div>
                 <div className="text-slate-400">
-                  ✓ Connecting agent orchestration layer
+                  ✓ Connecting real-time monitoring systems
                 </div>
                 <div className="text-cyan-400 animate-pulse">
-                  → Analyzing retrieval performance metrics...
+                  → Analyzing security threat patterns...
                 </div>
               </div>
             </div>
@@ -249,7 +261,7 @@ export default function AnalysisPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
               <div>
                 <h1 className="text-2xl font-bold text-cyan-400 font-mono mb-2">
-                  RAG + LangGraph Analytics Hub
+                  Analytics Hub
                 </h1>
                 <p className="text-slate-400 font-mono text-sm">
                   검색 증강 생성 및 워크플로우 오케스트레이션 모니터링 시스템
@@ -258,28 +270,28 @@ export default function AnalysisPage() {
 
               {/* Real-time Stats */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-600/30">
+                <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-600/30 text-center">
                   <div className="text-xs text-slate-400 font-mono mb-1">
-                    활성 쿼리
+                    활성 위협
                   </div>
                   <div className="text-lg font-bold text-cyan-400 font-mono">
-                    {realTimeData.activeQueries}
+                    {realTimeData.activeThreats}
                   </div>
                 </div>
-                <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-600/30">
+                <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-600/30 text-center">
                   <div className="text-xs text-slate-400 font-mono mb-1">
-                    벡터 연산
+                    AI 분석
                   </div>
                   <div className="text-lg font-bold text-green-400 font-mono">
-                    {realTimeData.vectorOperations}/s
+                    {realTimeData.aiAnalysisCount}/s
                   </div>
                 </div>
-                <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-600/30">
+                <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-600/30 text-center">
                   <div className="text-xs text-slate-400 font-mono mb-1">
-                    워크플로우
+                    차단된 공격
                   </div>
                   <div className="text-lg font-bold text-yellow-400 font-mono">
-                    {realTimeData.workflowExecutions}
+                    {realTimeData.blockedAttacks}
                   </div>
                 </div>
               </div>
@@ -327,51 +339,58 @@ export default function AnalysisPage() {
         {/* Content */}
         <div className="min-h-[600px]">
           <AnimatePresence mode="wait">
-            {activeTab === "rag" && (
+            {activeTab === "threatAnalysis" && (
               <motion.div
-                key="rag"
+                key="threatAnalysis"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <RAGPerformance data={mockRAGData.vectorDatabase} />
+                <ThreatAnalysis data={mockThreatData.threatAnalysis} />
               </motion.div>
             )}
 
-            {activeTab === "workflows" && (
+            {activeTab === "threatCategories" && (
               <motion.div
-                key="workflows"
+                key="threatCategories"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <LangGraphWorkflows data={mockRAGData.langGraphWorkflows} />
+                <ThreatCategories data={mockThreatData.threatCategories} />
               </motion.div>
             )}
 
-            {activeTab === "agents" && (
+            {activeTab === "aiInsights" && (
               <motion.div
-                key="agents"
+                key="aiInsights"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <AgentOrchestration data={mockRAGData.agentPerformance} />
+                <AIInsights data={mockThreatData.aiInsights} />
               </motion.div>
             )}
 
-            {activeTab === "vectors" && (
+            {activeTab === "realtimeAnalysis" && (
               <motion.div
-                key="vectors"
+                key="realtimeAnalysis"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <VectorDatabase
-                  data={mockRAGData.retrievalMetrics}
-                  selectedMetric={selectedMetric}
-                  onMetricChange={setSelectedMetric}
-                />
+                <RealtimeAnalysis data={mockThreatData.realtimeAnalysis} />
+              </motion.div>
+            )}
+
+            {activeTab === "modelPerformance" && (
+              <motion.div
+                key="modelPerformance"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <ModelPerformance data={mockThreatData.modelPerformance} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -403,223 +422,835 @@ export default function AnalysisPage() {
   );
 }
 
-// RAG Performance Component
-function RAGPerformance({ data }: { data: any }) {
+// Threat Analysis Component
+function ThreatAnalysis({ data }: { data: any }) {
   const metrics = [
     {
-      key: "documentsIndexed",
-      label: "인덱싱된 문서",
-      value: data.documentsIndexed.toLocaleString(),
+      key: "totalThreats",
+      label: "전체 위협 수",
+      value: data.totalThreats.toLocaleString(),
       color: "text-cyan-400",
       bg: "bg-cyan-500/10",
       border: "border-cyan-500/30",
     },
     {
-      key: "queryLatency",
-      label: "검색 지연시간",
-      value: `${data.queryLatency}ms`,
-      color: "text-blue-400",
-      bg: "bg-blue-500/10",
-      border: "border-blue-500/30",
+      key: "highRiskThreats",
+      label: "고위험 위협",
+      value: data.highRiskThreats.toLocaleString(),
+      color: "text-red-400",
+      bg: "bg-red-500/10",
+      border: "border-red-500/30",
     },
     {
-      key: "retrievalAccuracy",
-      label: "검색 정확도",
-      value: `${data.retrievalAccuracy}%`,
-      color: "text-purple-400",
-      bg: "bg-purple-500/10",
-      border: "border-purple-500/30",
-    },
-    {
-      key: "indexSize",
-      label: "인덱스 크기",
-      value: data.indexSize,
+      key: "aiAccuracy",
+      label: "AI 정확도",
+      value: `${data.aiAccuracy}%`,
       color: "text-green-400",
       bg: "bg-green-500/10",
       border: "border-green-500/30",
+    },
+    {
+      key: "processingTime",
+      label: "평균 처리시간",
+      value: `${data.processingTime}s`,
+      color: "text-purple-400",
+      bg: "bg-purple-500/10",
+      border: "border-purple-500/30",
     },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((metric, index) => (
-          <motion.div
-            key={metric.key}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1 }}
-            className={`bg-slate-900/70 backdrop-blur-md border ${metric.border} rounded-lg p-4 hover:scale-105 transition-transform`}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div
-                className={`w-12 h-12 rounded-lg ${metric.bg} flex items-center justify-center`}
-              >
-                <div
-                  className={`w-6 h-6 rounded ${metric.color} bg-current`}
-                ></div>
-              </div>
-              <div className="text-right">
-                <p
-                  className={`text-2xl font-bold ${metric.color} leading-none font-mono`}
-                >
-                  {metric.value}
-                </p>
-                <h3 className="text-xs text-slate-400 mt-1 font-mono">
-                  {metric.label}
-                </h3>
-              </div>
-            </div>
-            <div className="w-full bg-slate-700/30 rounded-full h-1">
+      <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
+        <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
+          <div className="flex gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          </div>
+          <span className="text-slate-400 text-sm font-mono ml-2">
+            ai-threat-analyzer --analysis --metrics --real-time
+          </span>
+        </div>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-cyan-400 mb-6 font-mono">
+            AI 위협 분석 개요
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {metrics.map((metric, index) => (
               <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "85%" }}
-                transition={{ delay: index * 0.1 + 0.3, duration: 0.8 }}
-                className={`h-1 rounded-full bg-gradient-to-r ${
-                  metric.color.includes("cyan")
-                    ? "from-cyan-500 to-blue-500"
-                    : metric.color.includes("blue")
-                    ? "from-blue-500 to-purple-500"
-                    : metric.color.includes("purple")
-                    ? "from-purple-500 to-pink-500"
-                    : "from-green-500 to-teal-500"
-                }`}
-              ></motion.div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Document Embedding Visualization */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden"
-        >
-          <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            </div>
-            <span className="text-slate-400 text-sm font-mono ml-2">
-              embedding-engine --real-time --documents
-            </span>
-          </div>
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-cyan-400 mb-4 font-mono">
-              문서 임베딩 처리
-            </h3>
-            <div className="h-64 bg-slate-800/30 rounded-lg border border-slate-600/30 flex flex-col items-center justify-center">
-              <div className="relative w-32 h-32 mx-auto mb-4">
-                <div className="absolute inset-0 border-4 border-cyan-500/20 rounded-full"></div>
-                <div className="absolute inset-0 border-4 border-cyan-500 rounded-full border-t-transparent animate-spin"></div>
-                <div className="absolute inset-4 border-4 border-blue-500/20 rounded-full"></div>
-                <div className="absolute inset-4 border-4 border-blue-500 rounded-full border-b-transparent animate-spin animate-reverse"></div>
-                <div className="absolute inset-8 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full flex items-center justify-center">
-                  <span className="text-cyan-400 font-mono text-xs">EMB</span>
+                key={metric.key}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`${metric.bg} ${metric.border} border rounded-lg p-4 relative overflow-hidden group hover:scale-105 transition-transform duration-300`}
+              >
+                <div className="relative z-10">
+                  <h4 className={`${metric.color} font-mono text-sm mb-2`}>
+                    {metric.label}
+                  </h4>
+                  <p className="text-white text-2xl font-bold font-mono">
+                    {metric.value}
+                  </p>
                 </div>
-              </div>
-              <div className="text-center text-slate-400 font-mono">
-                <p className="text-cyan-400 text-lg font-bold">
-                  {data.embeddingDimensions}
-                </p>
-                <p className="text-xs">Embedding Dimensions</p>
-                <p className="text-xs mt-2">
-                  Chunk Size: {data.chunkSize} tokens
-                </p>
-              </div>
-            </div>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300 ${
+                    metric.color.includes("cyan")
+                      ? "from-cyan-500 to-blue-500"
+                      : metric.color.includes("red")
+                      ? "from-red-500 to-pink-500"
+                      : metric.color.includes("green")
+                      ? "from-green-500 to-emerald-500"
+                      : "from-purple-500 to-violet-500"
+                  }`}
+                ></div>
+              </motion.div>
+            ))}
           </div>
-        </motion.div>
 
-        {/* Retrieval Pipeline */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden"
-        >
-          <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            </div>
-            <span className="text-slate-400 text-sm font-mono ml-2">
-              retrieval-pipeline --similarity --ranking
-            </span>
-          </div>
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-cyan-400 mb-4 font-mono">
-              검색 파이프라인
-            </h3>
+          {/* 위협 분포 차트 */}
+          <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+            <h4 className="text-blue-400 font-mono text-sm mb-4">
+              위험도별 위협 분포
+            </h4>
             <div className="space-y-3">
-              <div className="flex items-center justify-between bg-slate-800/30 rounded-lg p-3 border border-slate-600/30">
-                <span className="text-blue-400 font-mono">
-                  Query Processing
+              <div className="flex items-center justify-between">
+                <span className="text-red-400 font-mono text-sm">고위험</span>
+                <div className="flex-1 mx-4 bg-slate-700 rounded-full h-2">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${
+                        (data.highRiskThreats / data.totalThreats) * 100
+                      }%`,
+                    }}
+                    transition={{ delay: 0.5, duration: 1 }}
+                    className="h-2 bg-red-500 rounded-full"
+                  />
+                </div>
+                <span className="text-slate-300 font-mono text-sm">
+                  {data.highRiskThreats}
                 </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-slate-300 font-mono text-sm">
-                    Active
-                  </span>
-                </div>
               </div>
-              <div className="flex items-center justify-between bg-slate-800/30 rounded-lg p-3 border border-slate-600/30">
-                <span className="text-purple-400 font-mono">
-                  Similarity Search
+              <div className="flex items-center justify-between">
+                <span className="text-yellow-400 font-mono text-sm">
+                  중위험
                 </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-slate-300 font-mono text-sm">
-                    Active
-                  </span>
+                <div className="flex-1 mx-4 bg-slate-700 rounded-full h-2">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${
+                        (data.mediumRiskThreats / data.totalThreats) * 100
+                      }%`,
+                    }}
+                    transition={{ delay: 0.7, duration: 1 }}
+                    className="h-2 bg-yellow-500 rounded-full"
+                  />
                 </div>
-              </div>
-              <div className="flex items-center justify-between bg-slate-800/30 rounded-lg p-3 border border-slate-600/30">
-                <span className="text-green-400 font-mono">Result Ranking</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-slate-300 font-mono text-sm">
-                    Active
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between bg-slate-800/30 rounded-lg p-3 border border-slate-600/30">
-                <span className="text-yellow-400 font-mono">
-                  Context Assembly
+                <span className="text-slate-300 font-mono text-sm">
+                  {data.mediumRiskThreats}
                 </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-slate-300 font-mono text-sm">
-                    Active
-                  </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-green-400 font-mono text-sm">저위험</span>
+                <div className="flex-1 mx-4 bg-slate-700 rounded-full h-2">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${
+                        (data.lowRiskThreats / data.totalThreats) * 100
+                      }%`,
+                    }}
+                    transition={{ delay: 0.9, duration: 1 }}
+                    className="h-2 bg-green-500 rounded-full"
+                  />
                 </div>
+                <span className="text-slate-300 font-mono text-sm">
+                  {data.lowRiskThreats}
+                </span>
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
 }
 
-// LangGraph Workflows Component
-function LangGraphWorkflows({ data }: { data: any[] }) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "running":
-        return "text-green-400 bg-green-500/10 border-green-500/30";
-      case "paused":
-        return "text-yellow-400 bg-yellow-500/10 border-yellow-500/30";
-      case "failed":
+// Threat Categories Component
+function ThreatCategories({ data }: { data: any[] }) {
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case "critical":
         return "text-red-400 bg-red-500/10 border-red-500/30";
+      case "high":
+        return "text-orange-400 bg-orange-500/10 border-orange-500/30";
+      case "medium":
+        return "text-yellow-400 bg-yellow-500/10 border-yellow-500/30";
+      case "low":
+        return "text-green-400 bg-green-500/10 border-green-500/30";
       default:
         return "text-slate-400 bg-slate-500/10 border-slate-500/30";
+    }
+  };
+
+  const getTrendIcon = (trend: string) => {
+    if (trend.startsWith("+")) {
+      return <span className="text-red-400">↗</span>;
+    } else if (trend.startsWith("-")) {
+      return <span className="text-green-400">↘</span>;
+    }
+    return <span className="text-slate-400">→</span>;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
+        <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
+          <div className="flex gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          </div>
+          <span className="text-slate-400 text-sm font-mono ml-2">
+            threat-categorizer --classification --trend-analysis
+          </span>
+        </div>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-cyan-400 mb-6 font-mono">
+            위협 카테고리 분석
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data.map((category, index) => (
+              <motion.div
+                key={category.category}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 hover:scale-105 transition-transform"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-blue-400 font-mono font-bold text-lg">
+                    {category.category}
+                  </h4>
+                  <span
+                    className={`text-xs font-mono px-3 py-1 rounded-full border ${getSeverityColor(
+                      category.severity
+                    )}`}
+                  >
+                    {category.severity.toUpperCase()}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 font-mono text-sm">
+                      탐지 건수:
+                    </span>
+                    <span className="text-white font-mono text-xl font-bold">
+                      {category.count.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 font-mono text-sm">
+                      추세:
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {getTrendIcon(category.trend)}
+                      <span
+                        className={`font-mono text-sm ${
+                          category.trend.startsWith("+")
+                            ? "text-red-400"
+                            : category.trend.startsWith("-")
+                            ? "text-green-400"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {category.trend}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="w-full bg-slate-700/50 rounded-full h-2 mt-4">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${Math.min(
+                          (category.count / 500) * 100,
+                          100
+                        )}%`,
+                      }}
+                      transition={{ delay: index * 0.1 + 0.3, duration: 0.8 }}
+                      className={`h-2 rounded-full ${
+                        category.severity === "critical"
+                          ? "bg-red-500"
+                          : category.severity === "high"
+                          ? "bg-orange-500"
+                          : category.severity === "medium"
+                          ? "bg-yellow-500"
+                          : "bg-green-500"
+                      }`}
+                    ></motion.div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-slate-500 font-mono text-xs">
+                      위험도:
+                    </span>
+                    <div
+                      className={`font-mono text-sm ${
+                        category.severity === "critical"
+                          ? "text-red-400"
+                          : category.severity === "high"
+                          ? "text-orange-400"
+                          : category.severity === "medium"
+                          ? "text-yellow-400"
+                          : "text-green-400"
+                      }`}
+                    >
+                      {category.severity === "critical"
+                        ? "매우 높음"
+                        : category.severity === "high"
+                        ? "높음"
+                        : category.severity === "medium"
+                        ? "보통"
+                        : "낮음"}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* 위협 트렌드 요약 */}
+          <div className="mt-8 bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+            <h4 className="text-blue-400 font-mono text-sm mb-4">
+              위협 트렌드 요약
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-red-400 text-2xl font-bold font-mono">
+                  {data.filter((item) => item.trend.startsWith("+")).length}
+                </div>
+                <div className="text-slate-400 text-sm font-mono">
+                  증가 추세
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-green-400 text-2xl font-bold font-mono">
+                  {data.filter((item) => item.trend.startsWith("-")).length}
+                </div>
+                <div className="text-slate-400 text-sm font-mono">
+                  감소 추세
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-cyan-400 text-2xl font-bold font-mono">
+                  {data
+                    .reduce((sum, item) => sum + item.count, 0)
+                    .toLocaleString()}
+                </div>
+                <div className="text-slate-400 text-sm font-mono">
+                  총 위협 수
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// AI Insights Component
+function AIInsights({ data }: { data: any[] }) {
+  const getRiskLevelColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case "critical":
+        return "text-red-400 bg-red-500/10 border-red-500/30";
+      case "high":
+        return "text-orange-400 bg-orange-500/10 border-orange-500/30";
+      case "medium":
+        return "text-yellow-400 bg-yellow-500/10 border-yellow-500/30";
+      case "low":
+        return "text-green-400 bg-green-500/10 border-green-500/30";
+      default:
+        return "text-slate-400 bg-slate-500/10 border-slate-500/30";
+    }
+  };
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 90) return "text-green-400";
+    if (confidence >= 80) return "text-yellow-400";
+    if (confidence >= 70) return "text-orange-400";
+    return "text-red-400";
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString("ko-KR");
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
+        <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
+          <div className="flex gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          </div>
+          <span className="text-slate-400 text-sm font-mono ml-2">
+            ai-threat-insights --machine-learning --pattern-analysis
+          </span>
+        </div>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-cyan-400 mb-6 font-mono">
+            AI 위협 인사이트
+          </h3>
+
+          <div className="space-y-4">
+            {data.map((insight, index) => (
+              <motion.div
+                key={insight.insight}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 hover:scale-[1.02] transition-transform"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h4 className="text-blue-400 font-mono font-bold text-lg mb-2">
+                      {insight.insight}
+                    </h4>
+                    <div className="flex items-center gap-4 mb-3">
+                      <span
+                        className={`text-xs font-mono px-3 py-1 rounded-full border ${getRiskLevelColor(
+                          insight.riskLevel
+                        )}`}
+                      >
+                        {insight.riskLevel.toUpperCase()}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400 font-mono text-xs">
+                          신뢰도:
+                        </span>
+                        <span
+                          className={`font-mono text-sm font-bold ${getConfidenceColor(
+                            insight.confidence
+                          )}`}
+                        >
+                          {insight.confidence}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/30">
+                    <div className="text-slate-400 font-mono text-xs mb-1">
+                      영향받는 시스템
+                    </div>
+                    <div className="text-cyan-400 font-mono text-xl font-bold">
+                      {insight.affectedSystems}
+                    </div>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/30">
+                    <div className="text-slate-400 font-mono text-xs mb-1">
+                      위험 수준
+                    </div>
+                    <div
+                      className={`font-mono text-xl font-bold ${
+                        insight.riskLevel === "critical"
+                          ? "text-red-400"
+                          : insight.riskLevel === "high"
+                          ? "text-orange-400"
+                          : insight.riskLevel === "medium"
+                          ? "text-yellow-400"
+                          : "text-green-400"
+                      }`}
+                    >
+                      {insight.riskLevel === "critical"
+                        ? "매우 높음"
+                        : insight.riskLevel === "high"
+                        ? "높음"
+                        : insight.riskLevel === "medium"
+                        ? "보통"
+                        : "낮음"}
+                    </div>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/30">
+                    <div className="text-slate-400 font-mono text-xs mb-1">
+                      탐지 시각
+                    </div>
+                    <div className="text-purple-400 font-mono text-sm">
+                      {formatTimestamp(insight.timestamp)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Confidence Bar */}
+                <div className="w-full bg-slate-700/50 rounded-full h-2 mb-3">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${insight.confidence}%` }}
+                    transition={{ delay: index * 0.1 + 0.3, duration: 0.8 }}
+                    className={`h-2 rounded-full ${
+                      getConfidenceColor(insight.confidence).includes("green")
+                        ? "bg-green-500"
+                        : getConfidenceColor(insight.confidence).includes(
+                            "yellow"
+                          )
+                        ? "bg-yellow-500"
+                        : getConfidenceColor(insight.confidence).includes(
+                            "orange"
+                          )
+                        ? "bg-orange-500"
+                        : "bg-red-500"
+                    }`}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-500">
+                    AI 신뢰도: {insight.confidence}%
+                  </span>
+                  <span className="text-slate-500">
+                    분석 ID: AI-{Date.now() + index}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* AI 분석 요약 */}
+          <div className="mt-8 bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+            <h4 className="text-blue-400 font-mono text-sm mb-4">
+              AI 분석 요약
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-red-400 text-2xl font-bold font-mono">
+                  {data.filter((item) => item.riskLevel === "critical").length}
+                </div>
+                <div className="text-slate-400 text-sm font-mono">
+                  긴급 위협
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-orange-400 text-2xl font-bold font-mono">
+                  {data.filter((item) => item.riskLevel === "high").length}
+                </div>
+                <div className="text-slate-400 text-sm font-mono">
+                  고위험 위협
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-green-400 text-2xl font-bold font-mono">
+                  {(
+                    data.reduce((sum, item) => sum + item.confidence, 0) /
+                    data.length
+                  ).toFixed(1)}
+                  %
+                </div>
+                <div className="text-slate-400 text-sm font-mono">
+                  평균 신뢰도
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-cyan-400 text-2xl font-bold font-mono">
+                  {data.reduce((sum, item) => sum + item.affectedSystems, 0)}
+                </div>
+                <div className="text-slate-400 text-sm font-mono">
+                  영향받는 시스템
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Real-time Analysis Component
+function RealtimeAnalysis({ data }: { data: any[] }) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "분석중":
+        return "text-yellow-400 bg-yellow-500/10 border-yellow-500/30";
+      case "차단됨":
+        return "text-red-400 bg-red-500/10 border-red-500/30";
+      case "모니터링":
+        return "text-blue-400 bg-blue-500/10 border-blue-500/30";
+      case "허용됨":
+        return "text-green-400 bg-green-500/10 border-green-500/30";
+      default:
+        return "text-slate-400 bg-slate-500/10 border-slate-500/30";
+    }
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case "critical":
+        return "text-red-400";
+      case "high":
+        return "text-orange-400";
+      case "medium":
+        return "text-yellow-400";
+      case "low":
+        return "text-green-400";
+      default:
+        return "text-slate-400";
+    }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return "text-red-400";
+    if (score >= 70) return "text-orange-400";
+    if (score >= 50) return "text-yellow-400";
+    return "text-green-400";
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
+        <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
+          <div className="flex gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          </div>
+          <span className="text-slate-400 text-sm font-mono ml-2">
+            real-time-analyzer --live-monitoring --threat-detection
+          </span>
+        </div>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-cyan-400 font-mono">
+              실시간 위협 분석
+            </h3>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-green-400 font-mono text-sm">Live</span>
+            </div>
+          </div>
+
+          {/* 실시간 위협 이벤트 목록 */}
+          <div className="space-y-3">
+            {data.map((event, index) => (
+              <motion.div
+                key={event.eventId}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 hover:bg-slate-800/50 transition-all duration-200"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 items-center">
+                  {/* Event ID & Timestamp */}
+                  <div className="lg:col-span-1">
+                    <div className="text-blue-400 font-mono text-sm font-bold mb-1">
+                      {event.eventId}
+                    </div>
+                    <div className="text-slate-400 font-mono text-xs">
+                      {event.timestamp}
+                    </div>
+                  </div>
+
+                  {/* Source & Target */}
+                  <div className="lg:col-span-2">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400 font-mono text-xs">
+                          Source:
+                        </span>
+                        <span className="text-cyan-400 font-mono text-sm">
+                          {event.source}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400 font-mono text-xs">
+                          Target:
+                        </span>
+                        <span className="text-purple-400 font-mono text-sm">
+                          {event.target}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Threat Type & Severity */}
+                  <div className="lg:col-span-1">
+                    <div className="text-white font-mono text-sm font-bold mb-1">
+                      {event.threatType}
+                    </div>
+                    <div
+                      className={`font-mono text-xs ${getSeverityColor(
+                        event.severity
+                      )}`}
+                    >
+                      {event.severity.toUpperCase()}
+                    </div>
+                  </div>
+
+                  {/* AI Score */}
+                  <div className="lg:col-span-1">
+                    <div className="text-center">
+                      <div
+                        className={`text-2xl font-bold font-mono ${getScoreColor(
+                          event.aiScore
+                        )}`}
+                      >
+                        {event.aiScore}
+                      </div>
+                      <div className="text-slate-400 font-mono text-xs">
+                        AI 스코어
+                      </div>
+                    </div>
+                    <div className="w-full bg-slate-700 rounded-full h-1 mt-2">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${event.aiScore}%` }}
+                        transition={{ delay: index * 0.1 + 0.3, duration: 0.8 }}
+                        className={`h-1 rounded-full ${
+                          event.aiScore >= 90
+                            ? "bg-red-500"
+                            : event.aiScore >= 70
+                            ? "bg-orange-500"
+                            : event.aiScore >= 50
+                            ? "bg-yellow-500"
+                            : "bg-green-500"
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Status */}
+                  <div className="lg:col-span-1">
+                    <div className="flex justify-end">
+                      <span
+                        className={`text-xs font-mono px-3 py-1 rounded-full border ${getStatusColor(
+                          event.status
+                        )}`}
+                      >
+                        {event.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* 실시간 통계 */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 text-center">
+              <div className="text-cyan-400 text-2xl font-bold font-mono">
+                {data.length}
+              </div>
+              <div className="text-slate-400 text-sm font-mono">
+                실시간 이벤트
+              </div>
+            </div>
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 text-center">
+              <div className="text-red-400 text-2xl font-bold font-mono">
+                {data.filter((event) => event.severity === "critical").length}
+              </div>
+              <div className="text-slate-400 text-sm font-mono">긴급 위협</div>
+            </div>
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 text-center">
+              <div className="text-orange-400 text-2xl font-bold font-mono">
+                {data.filter((event) => event.status === "차단됨").length}
+              </div>
+              <div className="text-slate-400 text-sm font-mono">
+                차단된 위협
+              </div>
+            </div>
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 text-center">
+              <div className="text-green-400 text-2xl font-bold font-mono">
+                {(
+                  data.reduce((sum, event) => sum + event.aiScore, 0) /
+                  data.length
+                ).toFixed(1)}
+              </div>
+              <div className="text-slate-400 text-sm font-mono">
+                평균 AI 스코어
+              </div>
+            </div>
+          </div>
+
+          {/* 위협 유형별 분포 */}
+          <div className="mt-8 bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+            <h4 className="text-blue-400 font-mono text-sm mb-4">
+              위협 유형별 분포
+            </h4>
+            <div className="space-y-2">
+              {Object.entries(
+                data.reduce((acc, event) => {
+                  acc[event.threatType] = (acc[event.threatType] || 0) + 1;
+                  return acc;
+                }, {} as Record<string, number>)
+              ).map(([threatType, count], index) => (
+                <div
+                  key={threatType}
+                  className="flex items-center justify-between"
+                >
+                  <span className="text-slate-300 font-mono text-sm">
+                    {threatType}
+                  </span>
+                  <div className="flex items-center gap-2 flex-1 mx-4">
+                    <div className="flex-1 bg-slate-700 rounded-full h-2">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: `${((count as number) / data.length) * 100}%`,
+                        }}
+                        transition={{ delay: index * 0.1, duration: 0.8 }}
+                        className="h-2 bg-blue-500 rounded-full"
+                      />
+                    </div>
+                    <span className="text-blue-400 font-mono text-sm w-8">
+                      {count as number}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Model Performance Component
+function ModelPerformance({ data }: { data: any[] }) {
+  const metrics = [
+    { key: "accuracy", label: "정확도", color: "text-cyan-400", unit: "%" },
+    {
+      key: "processed",
+      label: "처리된 이벤트",
+      color: "text-blue-400",
+      unit: "",
+    },
+    { key: "blocked", label: "차단된 위협", color: "text-red-400", unit: "" },
+  ];
+
+  const getMetricIcon = (key: string) => {
+    switch (key) {
+      case "accuracy":
+        return "🎯";
+      case "processed":
+        return "📊";
+      case "blocked":
+        return "🛡️";
+      default:
+        return "📈";
     }
   };
 
@@ -633,280 +1264,182 @@ function LangGraphWorkflows({ data }: { data: any[] }) {
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           </div>
           <span className="text-slate-400 text-sm font-mono ml-2">
-            langgraph-orchestrator --workflows --execution --monitoring
+            ai-model-analyzer --performance --accuracy --metrics
           </span>
         </div>
         <div className="p-6">
           <h3 className="text-lg font-semibold text-cyan-400 mb-6 font-mono">
-            LangGraph 워크플로우 관리
+            AI 모델 성능 분석
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.map((workflow, index) => (
-              <motion.div
-                key={workflow.workflow}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 hover:scale-105 transition-transform"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-blue-400 font-mono font-bold text-lg">
-                    {workflow.workflow}
-                  </h4>
-                  <span
-                    className={`text-xs font-mono px-3 py-1 rounded-full border ${getStatusColor(
-                      workflow.status
-                    )}`}
-                  >
-                    {workflow.status.toUpperCase()}
-                  </span>
-                </div>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-mono text-sm">
-                      실행 횟수:
-                    </span>
-                    <span className="text-slate-300 font-mono text-sm">
-                      {workflow.executions.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-mono text-sm">
-                      성공률:
-                    </span>
-                    <span className="text-slate-300 font-mono text-sm">
-                      {workflow.successRate}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-700/50 rounded-full h-2">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${workflow.successRate}%` }}
-                      transition={{ delay: index * 0.1 + 0.3, duration: 0.8 }}
-                      className={`h-2 rounded-full ${
-                        workflow.successRate > 95
-                          ? "bg-green-500"
-                          : workflow.successRate > 90
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
-                      }`}
-                    ></motion.div>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-slate-500 font-mono text-xs">
-                      평균 실행시간:
-                    </span>
-                    <div className="text-purple-400 font-mono text-sm">
-                      {workflow.avgDuration}s
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Agent Orchestration Component
-function AgentOrchestration({ data }: { data: any[] }) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
-        <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-          </div>
-          <span className="text-slate-400 text-sm font-mono ml-2">
-            agent-orchestrator --multi-agent --performance --resources
-          </span>
-        </div>
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-cyan-400 mb-6 font-mono">
-            에이전트 오케스트레이션
-          </h3>
-          <div className="space-y-4">
-            {data.map((agent, index) => (
-              <motion.div
-                key={agent.agent}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-slate-800/30 rounded-lg p-5 border border-slate-600/30"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-blue-400 font-mono font-medium text-lg">
-                    {agent.agent}
-                  </h4>
-                  <span className="text-slate-300 font-mono text-sm font-bold">
-                    {agent.success}% success
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <div className="text-center">
-                    <div className="text-xs text-slate-400 font-mono mb-1">
-                      CPU 사용률
-                    </div>
-                    <div className="text-lg font-bold text-cyan-400 font-mono">
-                      {agent.cpu}%
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-slate-400 font-mono mb-1">
-                      메모리
-                    </div>
-                    <div className="text-lg font-bold text-blue-400 font-mono">
-                      {agent.memory}GB
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-slate-400 font-mono mb-1">
-                      처리 작업
-                    </div>
-                    <div className="text-lg font-bold text-purple-400 font-mono">
-                      {agent.tasks}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-slate-400 font-mono mb-1">
-                      성공률
-                    </div>
-                    <div className="text-lg font-bold text-green-400 font-mono">
-                      {agent.success}%
-                    </div>
-                  </div>
-                </div>
-
-                <div className="w-full bg-slate-700/50 rounded-full h-3">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${agent.success}%` }}
-                    transition={{ delay: index * 0.1 + 0.3, duration: 0.8 }}
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full"
-                  ></motion.div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Vector Database Component
-function VectorDatabase({
-  data,
-  selectedMetric,
-  onMetricChange,
-}: {
-  data: any[];
-  selectedMetric: string;
-  onMetricChange: (metric: string) => void;
-}) {
-  const metrics = [
-    { key: "queries", label: "검색 쿼리", color: "text-cyan-400" },
-    { key: "accuracy", label: "검색 정확도", color: "text-blue-400" },
-    { key: "latency", label: "응답 지연시간", color: "text-green-400" },
-  ];
-
-  return (
-    <div className="space-y-6">
-      {/* Metric Selector */}
-      <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
-        <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-          </div>
-          <span className="text-slate-400 text-sm font-mono ml-2">
-            vector-db-monitor --real-time --metrics --performance
-          </span>
-        </div>
-        <div className="p-4">
-          <div className="flex space-x-2">
+          {/* 메트릭 선택 버튼 */}
+          <div className="flex gap-2 mb-6 flex-wrap">
             {metrics.map((metric) => (
               <button
                 key={metric.key}
-                onClick={() => onMetricChange(metric.key)}
-                className={`px-4 py-2 rounded-lg transition-all duration-200 font-mono text-sm ${
-                  selectedMetric === metric.key
-                    ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-500/50"
-                    : "text-slate-400 hover:text-slate-300 hover:bg-slate-800/30"
-                }`}
+                className="px-4 py-2 rounded-lg transition-all duration-200 font-mono text-sm bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-500/50"
               >
+                <span className="mr-2">{getMetricIcon(metric.key)}</span>
                 {metric.label}
               </button>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* Vector Database Performance Chart */}
-      <div className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden">
-        <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-          </div>
-          <span className="text-slate-400 text-sm font-mono ml-2">
-            vector-performance-chart --24h --similarity-search
-          </span>
-        </div>
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-cyan-400 mb-4 font-mono">
-            24시간 벡터 데이터베이스 성능
-          </h3>
-          <div className="h-80 bg-slate-800/30 rounded-lg border border-slate-600/30 p-6">
-            <div className="h-full flex items-end justify-between gap-2">
+          {/* 성능 차트 */}
+          <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30 mb-6">
+            <h4 className="text-blue-400 font-mono text-sm mb-4">
+              시간대별 성능 추이
+            </h4>
+            <div className="flex items-end justify-between h-40 gap-2">
               {data.map((item, index) => {
-                const height =
-                  selectedMetric === "latency"
-                    ? (item[selectedMetric] /
-                        Math.max(...data.map((d) => d[selectedMetric]))) *
-                      100
-                    : (item[selectedMetric] /
-                        Math.max(...data.map((d) => d[selectedMetric]))) *
-                      100;
+                const accuracyHeight =
+                  (item.accuracy / Math.max(...data.map((d) => d.accuracy))) *
+                  100;
+                const processedHeight =
+                  (item.processed / Math.max(...data.map((d) => d.processed))) *
+                  100;
+                const blockedHeight =
+                  (item.blocked / Math.max(...data.map((d) => d.blocked))) *
+                  100;
+
                 return (
                   <div
-                    key={index}
-                    className="flex flex-col items-center flex-1"
+                    key={item.time}
+                    className="flex-1 flex flex-col items-center gap-1"
                   >
-                    <div className="text-xs text-slate-500 mb-2 font-mono">
+                    {/* 정확도 바 */}
+                    <div className="relative group w-full">
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${accuracyHeight}%` }}
+                        transition={{ delay: index * 0.1, duration: 0.8 }}
+                        className="bg-gradient-to-t from-cyan-500 to-blue-500 rounded-t min-h-[4px] relative group-hover:shadow-lg transition-all duration-200"
+                        style={{ height: `${accuracyHeight}%` }}
+                      >
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-xs text-cyan-400 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity font-mono whitespace-nowrap">
+                          정확도: {item.accuracy}%<br />
+                          처리: {item.processed}
+                          <br />
+                          차단: {item.blocked}
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    <div className="text-xs text-blue-400 font-mono text-center">
                       {item.time}
-                    </div>
-                    <div
-                      className="w-full bg-gradient-to-t from-purple-500/40 to-cyan-500/60 rounded-t hover:from-purple-500/60 hover:to-cyan-500/80 transition-all duration-300 cursor-pointer relative group"
-                      style={{ height: `${height}%`, minHeight: "20px" }}
-                    >
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-xs text-cyan-400 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity font-mono">
-                        {selectedMetric === "latency"
-                          ? `${item[selectedMetric]}ms`
-                          : selectedMetric === "accuracy"
-                          ? `${item[selectedMetric]}%`
-                          : item[selectedMetric].toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="text-xs text-blue-400 mt-2 font-mono">
-                      {selectedMetric === "latency"
-                        ? `${item[selectedMetric]}ms`
-                        : selectedMetric === "accuracy"
-                        ? `${item[selectedMetric]}%`
-                        : item[selectedMetric].toLocaleString()}
                     </div>
                   </div>
                 );
               })}
+            </div>
+          </div>
+
+          {/* 모델 성능 요약 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+              <h4 className="text-cyan-400 font-mono text-sm mb-2">
+                평균 정확도
+              </h4>
+              <div className="text-2xl font-bold text-cyan-400 font-mono">
+                {(
+                  data.reduce((sum, item) => sum + item.accuracy, 0) /
+                  data.length
+                ).toFixed(1)}
+                %
+              </div>
+              <div className="w-full bg-slate-700 rounded-full h-2 mt-2">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${
+                      data.reduce((sum, item) => sum + item.accuracy, 0) /
+                      data.length
+                    }%`,
+                  }}
+                  transition={{ delay: 0.5, duration: 1 }}
+                  className="h-2 bg-cyan-500 rounded-full"
+                />
+              </div>
+            </div>
+
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+              <h4 className="text-blue-400 font-mono text-sm mb-2">
+                총 처리 이벤트
+              </h4>
+              <div className="text-2xl font-bold text-blue-400 font-mono">
+                {data
+                  .reduce((sum, item) => sum + item.processed, 0)
+                  .toLocaleString()}
+              </div>
+              <div className="text-slate-400 font-mono text-xs mt-1">
+                시간당 평균:{" "}
+                {Math.round(
+                  data.reduce((sum, item) => sum + item.processed, 0) /
+                    data.length
+                )}
+              </div>
+            </div>
+
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+              <h4 className="text-red-400 font-mono text-sm mb-2">
+                총 차단 위협
+              </h4>
+              <div className="text-2xl font-bold text-red-400 font-mono">
+                {data
+                  .reduce((sum, item) => sum + item.blocked, 0)
+                  .toLocaleString()}
+              </div>
+              <div className="text-slate-400 font-mono text-xs mt-1">
+                차단률:{" "}
+                {(
+                  (data.reduce((sum, item) => sum + item.blocked, 0) /
+                    data.reduce((sum, item) => sum + item.processed, 0)) *
+                  100
+                ).toFixed(1)}
+                %
+              </div>
+            </div>
+          </div>
+
+          {/* 성능 지표 */}
+          <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+            <h4 className="text-blue-400 font-mono text-sm mb-4">성능 지표</h4>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-mono text-sm">
+                  최고 정확도
+                </span>
+                <span className="text-green-400 font-mono text-sm">
+                  {Math.max(...data.map((item) => item.accuracy))}%
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-mono text-sm">
+                  최저 정확도
+                </span>
+                <span className="text-orange-400 font-mono text-sm">
+                  {Math.min(...data.map((item) => item.accuracy))}%
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-mono text-sm">
+                  처리량 변동성
+                </span>
+                <span className="text-blue-400 font-mono text-sm">
+                  ±
+                  {Math.round(
+                    (Math.max(...data.map((item) => item.processed)) -
+                      Math.min(...data.map((item) => item.processed))) /
+                      2
+                  )}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-mono text-sm">
+                  평균 응답시간
+                </span>
+                <span className="text-purple-400 font-mono text-sm">1.2s</span>
+              </div>
             </div>
           </div>
         </div>
