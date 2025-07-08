@@ -39,18 +39,20 @@ const defaultLayouts = {
 function convertEventToEventDetail(event: Event): EventDetailType {
   return {
     id: event.id,
-    date: new Date(event.timestamp).toLocaleString(),
+    date: new Date(event.timestamp).toLocaleString("ko-KR"),
     anomalyScore: event.anomaly,
-    incident: `Security event detected: ${event.event} by user ${event.user}. ${
+    incident: `보안 이벤트 감지: 사용자 ${event.user}가 ${
+      event.event
+    } 활동을 수행했습니다. ${
       event.label === "Anomaly"
-        ? "This activity has been flagged as anomalous and requires investigation."
-        : "This appears to be normal activity."
+        ? "이 활동은 의심스러운 것으로 분류되어 조사가 필요합니다."
+        : "이 활동은 정상적인 활동으로 보입니다."
     }`,
     rowData: {
       ip_address: "192.168.1." + (Math.floor(Math.random() * 254) + 1),
       user: event.user,
       number: event.id.toString(),
-      location: "Unknown",
+      location: "위치 정보 없음",
       timestamp: event.timestamp,
       event_type: event.event,
       anomaly_score: event.anomaly.toFixed(3),
@@ -90,7 +92,7 @@ export default function Dashboard() {
         setError(null);
       } catch (err) {
         console.error("Failed to load data:", err);
-        setError("Failed to load security data");
+        setError("보안 데이터를 불러오는데 실패했습니다");
       } finally {
         setLoading(false);
       }
@@ -183,16 +185,15 @@ export default function Dashboard() {
 
   const getTerminalCommand = useCallback((type: string): string => {
     const commands: Record<string, string> = {
-      stats: "monitor --stats --realtime",
-      timeseries: "plot --timeseries --anomaly-detection",
-      donutchart: "analyze --threat-distribution --pie-chart",
-      barchart: "analyze --bar-chart --category-breakdown",
-      heatmap: "visualize --heatmap --correlation-matrix",
-      eventtable:
-        "tail -f /var/log/security/events.log | grep -E 'ALERT|CRITICAL'",
-      eventdetail: "inspect --event-detail --forensics",
+      stats: "시스템 상태 확인 중...",
+      timeseries: "시간별 데이터 분석 중...",
+      donutchart: "위험 요소 분석 중...",
+      barchart: "카테고리별 분석 중...",
+      heatmap: "상관관계 분석 중...",
+      eventtable: "보안 이벤트 모니터링 중...",
+      eventdetail: "상세 정보 분석 중...",
     };
-    return commands[type] || "execute --widget";
+    return commands[type] || "데이터 처리 중...";
   }, []);
 
   // 각 위젯을 개별적으로 메모이제이션
@@ -201,12 +202,12 @@ export default function Dashboard() {
       loading ? (
         <div className="flex items-center justify-center h-full">
           <div className="text-green-400 font-mono text-sm animate-pulse">
-            Loading system metrics...
+            시스템 정보를 불러오는 중...
           </div>
         </div>
       ) : error ? (
         <div className="flex items-center justify-center h-full">
-          <div className="text-red-400 font-mono text-sm">Error: {error}</div>
+          <div className="text-red-400 font-mono text-sm">오류: {error}</div>
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -229,11 +230,14 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
-                  Total Events
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  전체 활동
                 </div>
                 <div className="text-blue-400 text-xl font-mono font-bold">
                   {stats.totalEvents}
+                </div>
+                <div className="text-slate-500 text-xs mt-1">
+                  오늘 발생한 모든 활동 수
                 </div>
               </div>
             </div>
@@ -264,11 +268,14 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
-                  Anomalies
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  의심스러운 활동
                 </div>
                 <div className="text-red-400 text-xl font-mono font-bold">
                   {stats.anomalies}
+                </div>
+                <div className="text-slate-500 text-xs mt-1">
+                  주의가 필요한 활동 수
                 </div>
               </div>
             </div>
@@ -304,11 +311,14 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
-                  Avg Score
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  평균 위험도
                 </div>
                 <div className="text-yellow-400 text-xl font-mono font-bold">
                   {stats.avgAnomaly.toFixed(3)}
+                </div>
+                <div className="text-slate-500 text-xs mt-1">
+                  위험 수준 (0~1 사이)
                 </div>
               </div>
             </div>
@@ -353,13 +363,20 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide w-24">
-                  Threat Level
+                <div className="text-slate-400 text-xs font-mono uppercase tracking-wide">
+                  보안 상태
                 </div>
                 <div
                   className={`text-xl font-mono font-bold ${threatData.threatColor}`}
                 >
-                  {threatData.threatLevel}
+                  {threatData.threatLevel === "HIGH"
+                    ? "위험"
+                    : threatData.threatLevel === "MEDIUM"
+                    ? "주의"
+                    : "안전"}
+                </div>
+                <div className="text-slate-500 text-xs mt-1">
+                  현재 시스템 보안 상태
                 </div>
               </div>
             </div>
@@ -394,12 +411,12 @@ export default function Dashboard() {
       loading ? (
         <div className="flex items-center justify-center h-full">
           <div className="text-green-400 font-mono text-sm animate-pulse">
-            Loading events...
+            이벤트 정보를 불러오는 중...
           </div>
         </div>
       ) : error ? (
         <div className="flex items-center justify-center h-full">
-          <div className="text-red-400 font-mono text-sm">Error: {error}</div>
+          <div className="text-red-400 font-mono text-sm">오류: {error}</div>
         </div>
       ) : (
         <EventTable events={events} onEventSelect={handleEventClick} />
@@ -414,10 +431,12 @@ export default function Dashboard() {
       ) : (
         <div className="h-full flex items-center justify-center">
           <div className="text-center">
-            <div className="text-slate-500 text-4xl mb-4">◯</div>
-            <div className="text-slate-400 text-sm mb-2">No Event Selected</div>
+            <div className="text-slate-500 text-4xl mb-4">○</div>
+            <div className="text-slate-400 text-sm mb-2">
+              선택된 이벤트가 없습니다
+            </div>
             <div className="text-slate-500 text-xs">
-              Click on an event in the table to view details
+              아래 표에서 이벤트를 클릭하면 상세 정보가 표시됩니다
             </div>
           </div>
         </div>
@@ -431,7 +450,7 @@ export default function Dashboard() {
         case "stats":
           return (
             <WidgetWrapper
-              title="system-monitor"
+              title="시스템 현황"
               onRemove={() => console.log("Remove widget:", widget.id)}
               widgetType="stats"
             >
@@ -441,7 +460,7 @@ export default function Dashboard() {
         case "timeseries":
           return (
             <WidgetWrapper
-              title="anomaly-detection"
+              title="시간별 추이"
               onRemove={() => console.log("Remove widget:", widget.id)}
               widgetType="timeseries"
             >
@@ -451,7 +470,7 @@ export default function Dashboard() {
         case "donutchart":
           return (
             <WidgetWrapper
-              title="threat-analysis"
+              title="위험 요소 분석"
               onRemove={() => console.log("Remove widget:", widget.id)}
               widgetType="donutchart"
             >
@@ -461,7 +480,7 @@ export default function Dashboard() {
         case "barchart":
           return (
             <WidgetWrapper
-              title="category-breakdown"
+              title="분류별 현황"
               onRemove={() => console.log("Remove widget:", widget.id)}
               widgetType="barchart"
             >
@@ -471,7 +490,7 @@ export default function Dashboard() {
         case "heatmap":
           return (
             <WidgetWrapper
-              title="correlation-matrix"
+              title="상관관계 분석"
               onRemove={() => console.log("Remove widget:", widget.id)}
               widgetType="heatmap"
             >
@@ -481,7 +500,7 @@ export default function Dashboard() {
         case "eventtable":
           return (
             <WidgetWrapper
-              title="security-events"
+              title="보안 이벤트 목록"
               onRemove={() => console.log("Remove widget:", widget.id)}
               widgetType="eventtable"
             >
@@ -491,7 +510,7 @@ export default function Dashboard() {
         case "eventdetail":
           return (
             <WidgetWrapper
-              title="event-forensics"
+              title="이벤트 상세정보"
               onRemove={() => console.log("Remove widget:", widget.id)}
               widgetType="eventdetail"
             >

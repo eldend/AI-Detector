@@ -92,30 +92,30 @@ const mockAgentData = {
     {
       timestamp: "15:30:12",
       agent: "WS-SEC-003",
-      event: "Suspicious process execution detected",
+      event: "의심스러운 프로그램 실행이 감지되었습니다",
       severity: "high",
-      action: "Quarantined",
+      action: "격리 완료",
     },
     {
       timestamp: "15:29:45",
       agent: "SRV-PROD-001",
-      event: "Network connection to suspicious IP",
+      event: "위험한 사이트로의 접속 시도가 차단되었습니다",
       severity: "medium",
-      action: "Blocked",
+      action: "접속 차단",
     },
     {
       timestamp: "15:28:30",
       agent: "WS-DEV-001",
-      event: "File modification in system directory",
+      event: "시스템 폴더의 파일이 수정되었습니다",
       severity: "low",
-      action: "Logged",
+      action: "기록 완료",
     },
     {
       timestamp: "15:27:15",
       agent: "LNX-WEB-005",
-      event: "Multiple failed login attempts",
+      event: "잘못된 비밀번호로 로그인을 여러 번 시도했습니다",
       severity: "medium",
-      action: "Alerted",
+      action: "경고 발송",
     },
   ],
 };
@@ -126,6 +126,7 @@ export default function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [showGuide, setShowGuide] = useState(false);
 
   const { isLoggedIn, logout, isLoading } = useAuth();
   const router = useRouter();
@@ -206,32 +207,32 @@ export default function AgentsPage() {
               </div>
               <div className="flex-1 text-center">
                 <span className="text-slate-400 text-sm font-mono">
-                  agent-manager://scan --all-endpoints
+                  PC 보안 관리 - 모든 컴퓨터 상태 확인 중
                 </span>
               </div>
             </div>
             <div className="p-6">
               <div className="text-cyan-400 font-mono text-sm mb-4">
-                $ agent-discovery --scan --realtime
+                $ 컴퓨터 찾기 및 보안 상태 확인 중...
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-4 h-4 border-2 border-cyan-500/50 border-t-cyan-500 rounded-full animate-spin"></div>
                 <span className="text-slate-300 font-mono text-sm">
-                  보안 에이전트 스캔 중...
+                  연결된 컴퓨터들을 확인하는 중...
                 </span>
               </div>
               <div className="space-y-2 text-xs font-mono">
                 <div className="text-slate-400">
-                  {">"} Scanning network endpoints
+                  {">"} 네트워크에 연결된 컴퓨터 찾는 중
                 </div>
                 <div className="text-slate-400">
-                  {">"} Checking agent status
+                  {">"} 각 컴퓨터의 보안 상태 확인 중
                 </div>
                 <div className="text-slate-400">
-                  {">"} Collecting performance metrics
+                  {">"} 성능 및 위험 요소 분석 중
                 </div>
                 <div className="text-cyan-400 animate-pulse">
-                  {">"} Initializing agent dashboard...
+                  {">"} PC 관리 화면 준비 중...
                 </div>
               </div>
             </div>
@@ -259,12 +260,144 @@ export default function AgentsPage() {
       </div>
 
       <div className="relative z-10 p-6 space-y-6">
-        {/* Header */}
+        {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-blue-500/20 to-purple-600/20 backdrop-blur-md border border-blue-500/30 rounded-lg p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-2">
+                PC 관리 센터
+              </h1>
+              <p className="text-slate-300 text-sm">
+                회사 내 모든 컴퓨터의 보안 상태를 실시간으로 관리하고
+                모니터링합니다
+              </p>
+            </div>
+            <button
+              onClick={() => setShowGuide(!showGuide)}
+              className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 hover:bg-blue-500/30 transition-colors"
+            >
+              {showGuide ? "가이드 접기" : "초보자 가이드"}
+            </button>
+          </div>
+        </motion.div>
+
+        {/* 초보자 가이드 */}
+        <AnimatePresence>
+          {showGuide && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden"
+            >
+              <div className="p-6">
+                <h2 className="text-lg font-bold text-cyan-400 mb-4">
+                  PC 관리 센터 사용법
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-md font-semibold text-white mb-3">
+                      주요 기능 설명
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg">
+                        <span className="text-blue-400">•</span>
+                        <div>
+                          <div className="font-semibold text-blue-400">
+                            실시간 상태 모니터링
+                          </div>
+                          <div className="text-sm text-slate-400">
+                            회사 내 모든 컴퓨터의 연결 상태와 보안 상황을
+                            실시간으로 확인할 수 있습니다
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg">
+                        <span className="text-green-400">•</span>
+                        <div>
+                          <div className="font-semibold text-green-400">
+                            빠른 검색 및 필터링
+                          </div>
+                          <div className="text-sm text-slate-400">
+                            컴퓨터명, IP 주소, 위치로 원하는 컴퓨터를 빠르게
+                            찾을 수 있습니다
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg">
+                        <span className="text-yellow-400">•</span>
+                        <div>
+                          <div className="font-semibold text-yellow-400">
+                            위험 상황 조기 감지
+                          </div>
+                          <div className="text-sm text-slate-400">
+                            보안 위협이나 문제가 발생한 컴퓨터를 즉시 파악하고
+                            대응할 수 있습니다
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-md font-semibold text-white mb-3">
+                      이 화면 사용법
+                    </h3>
+                    <div className="space-y-3 text-sm">
+                      <div className="p-3 bg-slate-800/50 rounded-lg">
+                        <div className="font-semibold text-green-400 mb-1">
+                          1. 전체 현황 확인
+                        </div>
+                        <div className="text-slate-400">
+                          상단 통계에서 전체 컴퓨터 수와 연결 상태를 확인하세요
+                        </div>
+                      </div>
+                      <div className="p-3 bg-slate-800/50 rounded-lg">
+                        <div className="font-semibold text-blue-400 mb-1">
+                          2. 컴퓨터 목록 보기
+                        </div>
+                        <div className="text-slate-400">
+                          목록에서 각 컴퓨터의 상세 정보와 보안 상태를
+                          확인하세요
+                        </div>
+                      </div>
+                      <div className="p-3 bg-slate-800/50 rounded-lg">
+                        <div className="font-semibold text-purple-400 mb-1">
+                          3. 상세 정보 확인
+                        </div>
+                        <div className="text-slate-400">
+                          컴퓨터를 클릭하면 성능 정보와 보안 프로그램 상태를 볼
+                          수 있습니다
+                        </div>
+                      </div>
+                      <div className="p-3 bg-slate-800/50 rounded-lg">
+                        <div className="font-semibold text-yellow-400 mb-1">
+                          4. 원격 관리
+                        </div>
+                        <div className="text-slate-400">
+                          필요시 재시작이나 업데이트를 원격으로 실행할 수
+                          있습니다
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Terminal Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
           className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden"
         >
+          {/* Terminal Title Bar */}
           <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
             <div className="flex gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -272,25 +405,66 @@ export default function AgentsPage() {
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <span className="text-slate-400 text-sm font-mono ml-2">
-              agent-control-center://management --dashboard
+              PC 관리 모니터링 시스템
             </span>
           </div>
 
-          <div className="p-4">
-            <div className="flex items-center gap-4 text-sm font-mono mb-4">
-              <span className="text-cyan-400">security@agents:~$</span>
-              <span className="text-slate-300">
-                status --overview --realtime
-              </span>
+          {/* Command Interface */}
+          <div className="p-4 space-y-4">
+            <div className="flex items-center gap-4 text-sm font-mono">
+              <span className="text-blue-400">PC관리@보안센터:~$</span>
+              <div className="flex items-center gap-4 flex-1">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="컴퓨터명, IP 주소, 위치로 검색..."
+                  className="flex-1 bg-slate-800/50 border border-slate-600/50 rounded px-3 py-2 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
+                />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="bg-slate-800/50 border border-slate-600/50 rounded px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500/50"
+                >
+                  <option value="all">모든 컴퓨터</option>
+                  <option value="online">정상 연결</option>
+                  <option value="offline">연결 끊김</option>
+                  <option value="warning">주의 필요</option>
+                </select>
+                <button
+                  onClick={() =>
+                    setViewMode(viewMode === "grid" ? "list" : "grid")
+                  }
+                  className="bg-slate-800/50 border border-slate-600/50 rounded px-3 py-2 text-slate-300 hover:bg-slate-700/50 transition-colors"
+                >
+                  {viewMode === "grid" ? "목록으로 보기" : "격자로 보기"}
+                </button>
+              </div>
             </div>
 
-            <div>
-              <h1 className="text-2xl font-bold text-cyan-400 font-mono mb-2">
-                Security Agent Control Center
-              </h1>
-              <p className="text-slate-400 font-mono text-sm">
-                엔드포인트 보안 에이전트 실시간 관리 및 모니터링
-              </p>
+            {/* Status Info */}
+            <div className="flex items-center gap-6 text-xs font-mono">
+              <span className="text-slate-400">
+                총 컴퓨터 수:{" "}
+                <span className="text-cyan-400">
+                  {mockAgentData.overview.totalAgents}
+                </span>
+              </span>
+              <span className="text-slate-400">
+                정상 연결:{" "}
+                <span className="text-green-400">
+                  {mockAgentData.overview.onlineAgents}
+                </span>
+              </span>
+              <span className="text-slate-400">
+                연결 끊김:{" "}
+                <span className="text-red-400">
+                  {mockAgentData.overview.offlineAgents}
+                </span>
+              </span>
+              <span className="text-slate-400">
+                모니터링 상태: <span className="text-green-400">정상 작동</span>
+              </span>
             </div>
           </div>
         </motion.div>
@@ -299,34 +473,39 @@ export default function AgentsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
         >
           {[
             {
-              label: "총 에이전트",
+              label: "전체 컴퓨터",
               value: mockAgentData.overview.totalAgents,
               color: "text-blue-400",
+              description: "관리 중인 모든 컴퓨터 수",
             },
             {
-              label: "온라인",
+              label: "정상 연결",
               value: mockAgentData.overview.onlineAgents,
               color: "text-green-400",
+              description: "현재 온라인 상태인 컴퓨터",
             },
             {
-              label: "오프라인",
+              label: "연결 끊김",
               value: mockAgentData.overview.offlineAgents,
               color: "text-red-400",
+              description: "오프라인 상태인 컴퓨터",
             },
             {
-              label: "위험 알림",
+              label: "위험 경고",
               value: mockAgentData.overview.criticalAlerts,
               color: "text-yellow-400",
+              description: "즉시 조치가 필요한 위험 상황",
             },
             {
-              label: "초당 이벤트",
+              label: "보안 활동",
               value: mockAgentData.overview.eventsPerSecond,
               color: "text-purple-400",
+              description: "초당 처리되는 보안 이벤트 수",
             },
           ].map((stat, index) => (
             <motion.div
@@ -344,71 +523,18 @@ export default function AgentsPage() {
               <div className={`text-2xl font-bold font-mono ${stat.color}`}>
                 {stat.value.toLocaleString()}
               </div>
+              <div className="text-xs text-slate-500 mt-1">
+                {stat.description}
+              </div>
             </motion.div>
           ))}
-        </motion.div>
-
-        {/* Controls and Search */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg p-4"
-        >
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-            <div className="flex-1 max-w-md">
-              <input
-                type="text"
-                placeholder="호스트명, IP, 위치로 검색..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-800/50 border border-slate-600/50 rounded-lg px-4 py-2 text-slate-300 placeholder-slate-500 font-mono text-sm focus:outline-none focus:border-cyan-500/50"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-slate-800/50 border border-slate-600/50 rounded-lg px-3 py-2 text-slate-300 font-mono text-sm focus:outline-none focus:border-cyan-500/50"
-              >
-                <option value="all">모든 상태</option>
-                <option value="online">온라인</option>
-                <option value="offline">오프라인</option>
-                <option value="warning">경고</option>
-              </select>
-
-              <div className="flex border border-slate-600/50 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`px-3 py-2 text-sm font-mono transition-colors ${
-                    viewMode === "list"
-                      ? "bg-cyan-500/20 text-cyan-400"
-                      : "text-slate-400 hover:text-slate-300"
-                  }`}
-                >
-                  목록
-                </button>
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`px-3 py-2 text-sm font-mono transition-colors ${
-                    viewMode === "grid"
-                      ? "bg-cyan-500/20 text-cyan-400"
-                      : "text-slate-400 hover:text-slate-300"
-                  }`}
-                >
-                  그리드
-                </button>
-              </div>
-            </div>
-          </div>
         </motion.div>
 
         {/* Agents List/Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
           className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden"
         >
           <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
@@ -418,7 +544,7 @@ export default function AgentsPage() {
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <span className="text-slate-400 text-sm font-mono ml-2">
-              agent-list --status --metrics --realtime
+              컴퓨터 목록 - 상태 및 성능 정보 실시간 확인
             </span>
           </div>
 
@@ -429,7 +555,7 @@ export default function AgentsPage() {
                   <thead>
                     <tr className="border-b border-slate-700/50">
                       <th className="text-left py-3 px-4 text-slate-400 font-mono">
-                        호스트명
+                        컴퓨터명
                       </th>
                       <th className="text-left py-3 px-4 text-slate-400 font-mono">
                         IP 주소
@@ -438,19 +564,19 @@ export default function AgentsPage() {
                         운영체제
                       </th>
                       <th className="text-left py-3 px-4 text-slate-400 font-mono">
-                        상태
+                        연결 상태
                       </th>
                       <th className="text-left py-3 px-4 text-slate-400 font-mono">
-                        버전
+                        보안 프로그램
                       </th>
                       <th className="text-left py-3 px-4 text-slate-400 font-mono">
                         위치
                       </th>
                       <th className="text-left py-3 px-4 text-slate-400 font-mono">
-                        이벤트
+                        보안 활동
                       </th>
                       <th className="text-left py-3 px-4 text-slate-400 font-mono">
-                        위협
+                        발견된 위협
                       </th>
                     </tr>
                   </thead>
@@ -475,7 +601,7 @@ export default function AgentsPage() {
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`text-xs px-2 py-1 rounded border font-mono ${getStatusColor(
+                            className={`text-xs px-2 py-1 rounded border font-mono w-16 text-center inline-block ${getStatusColor(
                               agent.status
                             )}`}
                           >
@@ -523,7 +649,7 @@ export default function AgentsPage() {
                         {agent.hostname}
                       </h3>
                       <span
-                        className={`text-xs px-2 py-1 rounded border font-mono ${getStatusColor(
+                        className={`text-xs px-2 py-1 rounded border font-mono w-16 text-center inline-block ${getStatusColor(
                           agent.status
                         )}`}
                       >
@@ -573,7 +699,7 @@ export default function AgentsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.5 }}
           className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-lg overflow-hidden"
         >
           <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
@@ -583,14 +709,14 @@ export default function AgentsPage() {
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <span className="text-slate-400 text-sm font-mono ml-2">
-              event-stream --latest --agents
+              실시간 보안 활동 - 최근 발생한 보안 이벤트 확인
             </span>
           </div>
 
           <div className="p-4">
             <h3 className="text-orange-400 font-mono text-sm mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-              최근 에이전트 이벤트
+              최근 보안 활동 기록
             </h3>
             <div className="space-y-2">
               {mockAgentData.recentEvents.map((event, index) => (
@@ -652,7 +778,7 @@ export default function AgentsPage() {
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   </div>
                   <span className="text-slate-400 text-sm font-mono ml-2">
-                    agent-detail://{selectedAgent.hostname}
+                    컴퓨터 상세 정보 - {selectedAgent.hostname}
                   </span>
                 </div>
                 <button

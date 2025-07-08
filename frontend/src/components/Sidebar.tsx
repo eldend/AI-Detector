@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useDashboard } from "@/context/DashboardContext";
 
@@ -30,7 +31,10 @@ export default function Sidebar() {
     }, 100);
   };
 
-  const navItems: Array<{
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // 주요 메뉴 (초보자용)
+  const mainNavItems: Array<{
     href: string;
     label: string;
     command: string;
@@ -41,10 +45,10 @@ export default function Sidebar() {
   }> = [
     {
       href: "/dashboard",
-      label: "보안 대시보드",
-      command: "dashboard --overview",
+      label: "홈 대시보드",
+      command: "전체 현황 보기",
       status: "ACTIVE",
-      description: "보안 현황을 한눈에 확인하세요",
+      description: "보안 상황을 한눈에 확인하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -62,11 +66,33 @@ export default function Sidebar() {
       ),
     },
     {
+      href: "/events",
+      label: "보안 알림",
+      command: "위험 알림 확인",
+      status: "MONITORING",
+      description: "의심스러운 활동이나 문제를 확인하세요",
+      icon: (
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      ),
+    },
+    {
       href: "/agents",
-      label: "에이전트 관리",
-      command: "agent --monitor",
+      label: "PC 관리",
+      command: "컴퓨터 상태 확인",
       status: "ONLINE",
-      description: "PC와 서버의 보안 상태를 관리하세요",
+      description: "연결된 컴퓨터들의 보안 상태를 확인하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -84,11 +110,11 @@ export default function Sidebar() {
       ),
     },
     {
-      href: "/events",
-      label: "보안 이벤트",
-      command: "tail -f events.log",
-      status: "MONITORING",
-      description: "발생한 보안 이벤트를 실시간으로 확인하세요",
+      href: "/settings",
+      label: "설정",
+      command: "환경 설정",
+      status: "IDLE",
+      description: "사용자 설정 및 환경을 관리하세요",
       icon: (
         <svg
           className="h-4 w-4"
@@ -100,15 +126,32 @@ export default function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
           />
         </svg>
       ),
     },
+  ];
+
+  // 고급 기능 메뉴
+  const advancedNavItems: Array<{
+    href: string;
+    label: string;
+    command: string;
+    icon: React.ReactNode;
+    status?: string;
+    description?: string;
+  }> = [
     {
       href: "/tracing",
       label: "데이터 처리",
-      command: "trace --pipeline",
+      command: "데이터 변환 실행",
       status: "PROCESSING",
       description: "수집된 데이터를 분석 가능한 형태로 변환합니다",
       icon: (
@@ -130,7 +173,7 @@ export default function Sidebar() {
     {
       href: "/rules",
       label: "위협 탐지 규칙",
-      command: "rules --manage",
+      command: "탐지 규칙 관리",
       status: "LOADED",
       description: "어떤 상황을 위험으로 판단할지 설정하세요",
       icon: (
@@ -152,7 +195,7 @@ export default function Sidebar() {
     {
       href: "/analysis",
       label: "AI 위협 분석",
-      command: "langgraph --analyze",
+      command: "AI 분석 실행",
       status: "READY",
       description: "AI가 자동으로 위협을 분석하고 판단합니다",
       icon: (
@@ -174,7 +217,7 @@ export default function Sidebar() {
     {
       href: "/policy",
       label: "보안 정책",
-      command: "policy --configure",
+      command: "정책 설정",
       status: "LOADED",
       description: "시스템 전체의 보안 정책을 설정하세요",
       icon: (
@@ -195,10 +238,10 @@ export default function Sidebar() {
     },
     {
       href: "/response",
-      label: "자동 대응",
-      command: "response --auto",
-      status: "STANDBY",
-      description: "위험한 상황을 자동으로 차단하고 대응합니다",
+      label: "대응 제안",
+      command: "대응 제안 관리",
+      status: "READY",
+      description: "위험한 상황에 대한 대응 방안을 제안하고 관리합니다",
       icon: (
         <svg
           className="h-4 w-4"
@@ -210,35 +253,7 @@ export default function Sidebar() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M13 10V3L4 14h7v7l9-11h-7z"
-          />
-        </svg>
-      ),
-    },
-    {
-      href: "/settings",
-      label: "시스템 설정",
-      command: "config --system",
-      status: "IDLE",
-      description: "시스템 환경과 사용자 설정을 관리하세요",
-      icon: (
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
           />
         </svg>
       ),
@@ -294,22 +309,26 @@ export default function Sidebar() {
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
           <div className="flex-1 text-center">
-            <span className="text-slate-400 text-sm">
-              ai-security-nav.terminal
-            </span>
+            <span className="text-slate-400 text-sm">보안 네비게이션</span>
           </div>
         </div>
 
         {/* Logo/Brand */}
         <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">X</span>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-700/50 border border-slate-600/50 flex items-center justify-center">
+              <Image
+                src="/logo.png"
+                alt="Project Logo"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-white">ShiftX</h1>
+            <div className="text-left">
+              <h1 className="text-base font-bold text-white">ShiftX</h1>
               <p className="text-xs text-slate-400 -mt-1">
-                v2.3.1 | Build 2024.3
+                v2.3.1 | 빌드 2024.3
               </p>
             </div>
           </div>
@@ -317,19 +336,19 @@ export default function Sidebar() {
 
         {/* System Status */}
         <div className="bg-slate-800/50 rounded border border-slate-700/50 p-2 mt-3">
-          <div className="text-xs text-slate-400 mb-2">SYSTEM STATUS</div>
+          <div className="text-xs text-slate-400 mb-2">시스템 상태</div>
           <div className="grid grid-cols-2 gap-2 text-xs mb-2">
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-400">ONLINE</span>
+              <span className="text-green-400">온라인</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-blue-400">SECURED</span>
+              <span className="text-blue-400">보안</span>
             </div>
           </div>
           <div className="text-slate-500 text-xs">
-            {currentTime.toLocaleString("en-US", {
+            {currentTime.toLocaleString("ko-KR", {
               hour12: false,
               month: "2-digit",
               day: "2-digit",
@@ -342,12 +361,11 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-grow p-4">
-        <div className="text-green-400 text-xs mb-4 font-mono">
-          $ ls -la /security/modules
-        </div>
+        <div className="text-green-400 text-xs mb-4 font-mono">주요 기능</div>
 
-        <ul className="space-y-1">
-          {navItems.map((item, index) => {
+        {/* 주요 메뉴 */}
+        <ul className="space-y-1 mb-6">
+          {mainNavItems.map((item, index) => {
             const isActive = pathname === item.href;
 
             return (
@@ -383,7 +401,7 @@ export default function Sidebar() {
                           {item.label}
                         </div>
                         <div className="text-xs text-slate-600 font-mono truncate">
-                          $ {item.command}
+                          {item.command}
                         </div>
                       </div>
                     </div>
@@ -392,7 +410,9 @@ export default function Sidebar() {
                       <div className="flex items-center gap-1">
                         {getStatusDot(item.status)}
                         <span
-                          className={`text-xs ${getStatusColor(item.status)}`}
+                          className={`text-xs w-20 text-center inline-block ${getStatusColor(
+                            item.status
+                          )}`}
                         >
                           {item.status}
                         </span>
@@ -425,7 +445,7 @@ export default function Sidebar() {
                           {item.label}
                         </div>
                         <div className="text-xs text-slate-600 font-mono truncate">
-                          $ {item.command}
+                          {item.command}
                         </div>
                       </div>
                     </div>
@@ -434,7 +454,9 @@ export default function Sidebar() {
                       <div className="flex items-center gap-1">
                         {getStatusDot(item.status)}
                         <span
-                          className={`text-xs ${getStatusColor(item.status)}`}
+                          className={`text-xs w-20 text-center inline-block ${getStatusColor(
+                            item.status
+                          )}`}
                         >
                           {item.status}
                         </span>
@@ -446,12 +468,95 @@ export default function Sidebar() {
             );
           })}
         </ul>
+
+        {/* 고급 기능 섹션 */}
+        <div className="border-t border-slate-700/50 pt-4">
+          <motion.button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center justify-between w-full p-2 text-xs text-slate-400 hover:text-slate-300 transition-colors"
+          >
+            <span className="font-mono">고급 기능</span>
+            <motion.svg
+              animate={{ rotate: showAdvanced ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </motion.svg>
+          </motion.button>
+
+          <AnimatePresence>
+            {showAdvanced && (
+              <motion.ul
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-1 mt-2 overflow-hidden"
+              >
+                {advancedNavItems.map((item, index) => {
+                  const isActive = pathname === item.href;
+
+                  return (
+                    <motion.li
+                      key={item.href}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.03 }}
+                    >
+                      <Link
+                        href={item.href}
+                        className={`group flex items-center justify-between p-2 pl-6 rounded border transition-all duration-200 w-full text-left ${
+                          isActive
+                            ? "bg-blue-500/20 border-blue-500/40 text-blue-300"
+                            : "border-slate-700/30 text-slate-400 hover:bg-slate-800/30 hover:border-slate-600/30 hover:text-slate-300"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <span
+                            className={`${
+                              isActive ? "text-blue-400" : "text-slate-500"
+                            } group-hover:text-slate-400`}
+                          >
+                            {item.icon}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div
+                              className={`text-xs ${
+                                isActive ? "text-blue-300" : "text-slate-400"
+                              }`}
+                            >
+                              {item.label}
+                            </div>
+                          </div>
+                        </div>
+
+                        {item.status && (
+                          <div className="flex items-center gap-1">
+                            {getStatusDot(item.status)}
+                          </div>
+                        )}
+                      </Link>
+                    </motion.li>
+                  );
+                })}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+        </div>
       </nav>
 
       {/* Terminal Footer */}
       <div className="border-t border-slate-800/50 p-4">
         <div className="text-xs text-slate-400 text-center">
-          Terminal Ready • All Systems Operational
+          준비 완료 • 모든 시스템 정상 작동
         </div>
       </div>
     </motion.aside>

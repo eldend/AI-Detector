@@ -24,9 +24,9 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
   }, []);
 
   const menuItems = [
-    { label: "System Reports", href: "#", icon: "📊" },
-    { label: "Event Analytics", href: "#", icon: "📈" },
-    { label: "Help & Docs", href: "#", icon: "📖" },
+    { label: "시스템 리포트", href: "#", icon: "•" },
+    { label: "이벤트 분석", href: "#", icon: "•" },
+    { label: "도움말", href: "#", icon: "•" },
   ];
 
   return (
@@ -36,10 +36,10 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-xs">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-green-400">SECURE</span>
+            <span className="text-green-400">보안 상태 정상</span>
           </div>
           <div className="text-slate-500 text-xs">
-            {currentTime.toLocaleString("en-US", {
+            {currentTime.toLocaleString("ko-KR", {
               hour12: false,
               weekday: "short",
               month: "2-digit",
@@ -62,9 +62,9 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
             </div>
             <div className="hidden md:block">
               <p className="text-sm font-semibold text-slate-200">
-                {currentUser || "admin"}
+                {currentUser || "관리자"}
               </p>
-              <p className="text-xs text-green-400">online • root</p>
+              <p className="text-xs text-green-400">온라인 • 접속중</p>
             </div>
           </div>
 
@@ -111,12 +111,12 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                       <div className="flex-1 text-center">
                         <span className="text-slate-400 text-xs">
-                          user-menu.terminal
+                          사용자 메뉴
                         </span>
                       </div>
                     </div>
                     <div className="text-xs text-green-400">
-                      $ whoami && menu --show
+                      메뉴 실행 중...
                     </div>
                   </div>
 
@@ -153,9 +153,9 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                           />
                         </svg>
                         <div>
-                          <div className="font-semibold">Dashboard Config</div>
+                          <div className="font-semibold">대시보드 설정</div>
                           <div className="text-xs text-slate-500">
-                            $ config --edit
+                            화면 구성 변경
                           </div>
                         </div>
                       </div>
@@ -179,8 +179,11 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                           <div>
                             <div className="font-semibold">{item.label}</div>
                             <div className="text-xs text-slate-500">
-                              $ open{" "}
-                              {item.label.toLowerCase().replace(" ", "-")}
+                              {item.label === "시스템 리포트"
+                                ? "보고서 보기"
+                                : item.label === "이벤트 분석"
+                                ? "상세 분석"
+                                : "도움말 보기"}
                             </div>
                           </div>
                         </div>
@@ -215,9 +218,9 @@ export default function Header({ onLogout, onOpenSettings }: HeaderProps) {
                           />
                         </svg>
                         <div>
-                          <div className="font-semibold">Terminate Session</div>
+                          <div className="font-semibold">로그아웃</div>
                           <div className="text-xs text-red-500/70">
-                            $ logout --force
+                            시스템 종료
                           </div>
                         </div>
                       </div>

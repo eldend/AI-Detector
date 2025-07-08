@@ -48,7 +48,7 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
   });
 
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString("en-US", {
+    return new Date(timestamp).toLocaleString("ko-KR", {
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
@@ -69,7 +69,7 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
       {/* Terminal Output Header */}
       <div className="bg-slate-800/50 border-b border-slate-700/50 p-2">
         <div className="text-xs text-slate-400">
-          Found {events.length} events | Monitoring real-time...
+          총 {events.length}개의 이벤트 발견 | 실시간 모니터링 중...
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
             onPointerDown={preventDrag}
             className="col-span-3 cursor-pointer hover:text-blue-400 transition-colors flex items-center justify-center gap-1 no-drag text-center"
           >
-            TIMESTAMP
+            발생 시간
             {sortField === "timestamp" && (
               <span className="text-blue-400">
                 {sortDirection === "asc" ? "↑" : "↓"}
@@ -97,7 +97,7 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
             onPointerDown={preventDrag}
             className="col-span-2 cursor-pointer hover:text-blue-400 transition-colors flex items-center justify-center gap-1 no-drag text-center"
           >
-            USER
+            사용자
             {sortField === "user" && (
               <span className="text-blue-400">
                 {sortDirection === "asc" ? "↑" : "↓"}
@@ -111,14 +111,14 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
             onPointerDown={preventDrag}
             className="col-span-2 cursor-pointer hover:text-blue-400 transition-colors flex items-center justify-center gap-1 no-drag text-center"
           >
-            ANOMALY
+            위험도
             {sortField === "anomaly" && (
               <span className="text-blue-400">
                 {sortDirection === "asc" ? "↑" : "↓"}
               </span>
             )}
           </div>
-          <div className="col-span-2 text-center no-drag">STATUS</div>
+          <div className="col-span-2 text-center no-drag">상태</div>
           <div
             onClick={(e) => handleSortClick(e, "event")}
             onMouseDown={preventDrag}
@@ -126,7 +126,7 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
             onPointerDown={preventDrag}
             className="col-span-3 cursor-pointer hover:text-blue-400 transition-colors flex items-center justify-center gap-1 no-drag text-center"
           >
-            EVENT TYPE
+            이벤트 유형
             {sortField === "event" && (
               <span className="text-blue-400">
                 {sortDirection === "asc" ? "↑" : "↓"}
@@ -142,10 +142,10 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="text-slate-500 text-sm font-mono">
-                No events found
+                이벤트가 없습니다
               </div>
               <div className="text-slate-600 text-xs font-mono mt-1">
-                $ waiting for incoming data...
+                데이터 대기 중...
               </div>
             </div>
           </div>
@@ -224,10 +224,10 @@ export default function EventTable({ events, onEventSelect }: EventTableProps) {
                     }`}
                   >
                     {event.anomaly > 0.7
-                      ? "ALERT"
+                      ? "위험"
                       : event.anomaly > 0.4
-                      ? "WARNING"
-                      : "NORMAL"}
+                      ? "주의"
+                      : "정상"}
                   </span>
                 </div>
 
