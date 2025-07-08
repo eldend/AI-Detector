@@ -34,7 +34,7 @@ interface TimeSeriesChartProps {
 
 export default function TimeSeriesChart({
   data,
-  title = "Anomaly Score Trend",
+  title = "위험도 점수 추세",
   color = "#60a5fa",
 }: TimeSeriesChartProps) {
   // Mock data for demonstration - replace with real data
@@ -62,7 +62,7 @@ export default function TimeSeriesChart({
   const chartConfig = {
     labels: chartData.map((item) => {
       const date = new Date(item.timestamp);
-      return date.toLocaleTimeString("en-US", {
+      return date.toLocaleTimeString("ko-KR", {
         month: "short",
         day: "numeric",
         hour: "2-digit",
@@ -71,7 +71,7 @@ export default function TimeSeriesChart({
     }),
     datasets: [
       {
-        label: "Anomaly Score",
+        label: "위험도 점수",
         data: processedData.map((item) => item.y),
         borderColor: "#60a5fa", // Terminal blue
         backgroundColor: "rgba(96, 165, 250, 0.1)", // Terminal blue with opacity
@@ -129,9 +129,9 @@ export default function TimeSeriesChart({
             const dataIndex = context.dataIndex;
             const item = chartData[dataIndex];
             return [
-              `Score: ${context.parsed.y.toFixed(3)}`,
-              `Status: ${item.label}`,
-              `Time: ${item.timestamp}`,
+              `점수: ${context.parsed.y.toFixed(3)}`,
+              `상태: ${item.label === "Anomaly" ? "위험" : "정상"}`,
+              `시간: ${item.timestamp}`,
             ];
           },
         },

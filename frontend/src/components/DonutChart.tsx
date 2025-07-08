@@ -15,14 +15,14 @@ interface DonutChartProps {
 export default function DonutChart({
   normalCount = 4,
   anomalyCount = 10,
-  title = "Event Distribution",
+  title = "이벤트 분포",
 }: DonutChartProps) {
   const total = normalCount + anomalyCount;
   const normalPercentage = ((normalCount / total) * 100).toFixed(1);
   const anomalyPercentage = ((anomalyCount / total) * 100).toFixed(1);
 
   const data = {
-    labels: ["Normal", "Anomaly"],
+    labels: ["정상", "위험"],
     datasets: [
       {
         data: [normalCount, anomalyCount],
@@ -83,7 +83,7 @@ export default function DonutChart({
             const label = context.label;
             const value = context.parsed;
             const percentage = ((value / total) * 100).toFixed(1);
-            return `${label}: ${value} events (${percentage}%)`;
+            return `${label}: ${value}개 이벤트 (${percentage}%)`;
           },
         },
       },
@@ -117,7 +117,7 @@ export default function DonutChart({
                 {anomalyPercentage}%
               </div>
               <div className="text-slate-400 text-xs font-mono uppercase tracking-wider">
-                Anomaly Rate
+                위험도 비율
               </div>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function DonutChart({
               {normalCount}
             </div>
             <div className="text-green-300 text-xs font-mono uppercase tracking-wide">
-              Normal
+              정상
             </div>
             <div className="text-green-500/70 text-xs font-mono">
               {normalPercentage}%
@@ -143,7 +143,7 @@ export default function DonutChart({
               {anomalyCount}
             </div>
             <div className="text-red-300 text-xs font-mono uppercase tracking-wide">
-              Anomaly
+              위험
             </div>
             <div className="text-red-500/70 text-xs font-mono">
               {anomalyPercentage}%
@@ -154,11 +154,11 @@ export default function DonutChart({
         {/* Terminal info line */}
         <div className="bg-slate-800/30 border border-slate-700/50 rounded px-3 py-2">
           <div className="text-slate-400 text-xs font-mono text-center">
-            Total Events:{" "}
+            전체 이벤트:{" "}
             <span className="text-blue-400 font-semibold">{total}</span> |
-            Processed:{" "}
+            처리됨:{" "}
             <span className="text-green-400 font-semibold">{total}</span> |
-            Failed: <span className="text-red-400 font-semibold">0</span>
+            실패: <span className="text-red-400 font-semibold">0</span>
           </div>
         </div>
       </div>

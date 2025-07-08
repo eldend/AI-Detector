@@ -6,48 +6,48 @@ import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/context/AuthContext";
 
-// Mock data for automated response system (inspired by EDR products)
+// Mock data for response recommendation system (inspired by EDR products)
 const mockResponseData = {
   statistics: {
     activeThreats: 7,
-    autoBlocked: 89,
+    recommendedActions: 89,
     manualActions: 23,
     avgResponseTime: 2.3,
     successRate: 98.7,
-    isolatedHosts: 3,
+    reportedIncidents: 12,
   },
   responseTypes: [
     {
       id: "isolation",
-      name: "호스트 격리",
+      name: "호스트 격리 제안",
       count: 15,
       color: "text-red-400",
       automated: true,
     },
     {
       id: "process-kill",
-      name: "프로세스 종료",
+      name: "프로세스 종료 제안",
       count: 34,
       color: "text-orange-400",
       automated: true,
     },
     {
       id: "network-block",
-      name: "네트워크 차단",
+      name: "네트워크 차단 제안",
       count: 28,
       color: "text-yellow-400",
       automated: false,
     },
     {
       id: "file-quarantine",
-      name: "파일 격리",
+      name: "파일 격리 제안",
       count: 19,
       color: "text-green-400",
       automated: true,
     },
     {
       id: "rollback",
-      name: "시스템 복구",
+      name: "시스템 복구 제안",
       count: 8,
       color: "text-blue-400",
       automated: false,
@@ -58,27 +58,27 @@ const mockResponseData = {
       id: "incident-001",
       threat: "Ransomware Detection",
       severity: "CRITICAL",
-      status: "RESPONDING",
+      status: "INVESTIGATING",
       target: "WS-PROD-045",
       detectedAt: "2024-12-20 15:42:18",
       responseTime: "1.2초",
-      actions: ["ISOLATED", "PROCESS_KILLED", "FILES_QUARANTINED"],
-      description: "랜섬웨어 암호화 활동 탐지 및 자동 격리 수행",
+      actions: ["DETECTED", "REPORTED", "RECOMMENDATION_SENT"],
+      description: "랜섬웨어 암호화 활동 탐지 및 대응 제안",
       mitreId: "T1486",
-      autoResponse: true,
+      autoResponse: false,
     },
     {
       id: "incident-002",
       threat: "Lateral Movement",
       severity: "HIGH",
-      status: "BLOCKED",
+      status: "MONITORING",
       target: "SRV-DB-012",
       detectedAt: "2024-12-20 15:38:45",
       responseTime: "0.8초",
-      actions: ["NETWORK_BLOCKED", "SESSION_TERMINATED"],
-      description: "측면 이동 시도 차단",
+      actions: ["DETECTED", "MONITORING", "RECOMMENDATION_SENT"],
+      description: "측면 이동 시도 감지",
       mitreId: "T1021",
-      autoResponse: true,
+      autoResponse: false,
     },
     {
       id: "incident-003",
@@ -97,22 +97,22 @@ const mockResponseData = {
       id: "incident-004",
       threat: "Process Injection",
       severity: "MEDIUM",
-      status: "CONTAINED",
+      status: "INVESTIGATING",
       target: "WS-ADMIN-003",
       detectedAt: "2024-12-20 15:30:33",
       responseTime: "1.7초",
-      actions: ["PROCESS_KILLED", "MEMORY_DUMPED"],
-      description: "프로세스 인젝션 기법 탐지 및 차단",
+      actions: ["DETECTED", "ANALYZED", "RECOMMENDATION_SENT"],
+      description: "프로세스 인젝션 기법 탐지 및 분석",
       mitreId: "T1055",
-      autoResponse: true,
+      autoResponse: false,
     },
   ],
   responseActions: [
     {
       id: "action-001",
-      type: "AUTO_ISOLATION",
-      name: "자동 호스트 격리",
-      description: "악성 활동 탐지 시 즉시 네트워크에서 격리",
+      type: "ISOLATION_RECOMMENDATION",
+      name: "호스트 격리 제안",
+      description: "악성 활동 탐지 시 네트워크 격리 방안 제안",
       enabled: true,
       priority: 1,
       conditions: ["severity >= HIGH", "malware_detected", "lateral_movement"],
@@ -121,9 +121,9 @@ const mockResponseData = {
     },
     {
       id: "action-002",
-      type: "PROCESS_TERMINATION",
-      name: "악성 프로세스 종료",
-      description: "의심스러운 프로세스 즉시 종료",
+      type: "PROCESS_TERMINATION_RECOMMENDATION",
+      name: "프로세스 종료 제안",
+      description: "의심스러운 프로세스 종료 방안 제안",
       enabled: true,
       priority: 2,
       conditions: [
@@ -136,9 +136,9 @@ const mockResponseData = {
     },
     {
       id: "action-003",
-      type: "NETWORK_BLOCKING",
-      name: "네트워크 차단",
-      description: "악성 IP/도메인 자동 차단",
+      type: "NETWORK_BLOCKING_RECOMMENDATION",
+      name: "네트워크 차단 제안",
+      description: "악성 IP/도메인 차단 방안 제안",
       enabled: true,
       priority: 3,
       conditions: ["c2_communication", "data_exfiltration", "malicious_domain"],
@@ -147,9 +147,9 @@ const mockResponseData = {
     },
     {
       id: "action-004",
-      type: "FILE_QUARANTINE",
-      name: "파일 격리",
-      description: "악성 파일을 안전한 위치로 이동",
+      type: "FILE_QUARANTINE_RECOMMENDATION",
+      name: "파일 격리 제안",
+      description: "악성 파일 격리 방안 제안",
       enabled: true,
       priority: 4,
       conditions: ["malware_file", "suspicious_executable", "encrypted_file"],
@@ -160,8 +160,8 @@ const mockResponseData = {
   playbooks: [
     {
       id: "playbook-001",
-      name: "Ransomware Response",
-      description: "랜섬웨어 감염 시 자동 대응 플레이북",
+      name: "Ransomware Response Recommendations",
+      description: "랜섬웨어 감염 시 대응 제안 플레이북",
       steps: 8,
       avgDuration: "5분",
       category: "malware",
@@ -172,8 +172,8 @@ const mockResponseData = {
     },
     {
       id: "playbook-002",
-      name: "APT Detection Response",
-      description: "고급 지속 위협 탐지 시 대응 절차",
+      name: "APT Detection Response Recommendations",
+      description: "고급 지속 위협 탐지 시 대응 제안 절차",
       steps: 12,
       avgDuration: "15분",
       category: "apt",
@@ -184,8 +184,8 @@ const mockResponseData = {
     },
     {
       id: "playbook-003",
-      name: "Insider Threat Mitigation",
-      description: "내부자 위협 완화 절차",
+      name: "Insider Threat Mitigation Recommendations",
+      description: "내부자 위협 완화 제안 절차",
       steps: 6,
       avgDuration: "8분",
       category: "insider",
@@ -198,71 +198,71 @@ const mockResponseData = {
   recentActivity: [
     {
       timestamp: "15:45:23",
-      action: "자동 호스트 격리",
+      action: "대응 제안 전송",
       target: "WS-PROD-045",
       status: "SUCCESS",
     },
     {
       timestamp: "15:44:12",
-      action: "프로세스 종료",
+      action: "위협 분석 완료",
       target: "SRV-WEB-023",
       status: "SUCCESS",
     },
     {
       timestamp: "15:43:08",
-      action: "네트워크 차단",
+      action: "보안 권고 발송",
       target: "외부IP-192.168.1.100",
       status: "SUCCESS",
     },
   ],
-  autoResponseLogs: [
+  recommendationLogs: [
     {
-      id: "auto-001",
+      id: "rec-001",
       timestamp: "2024-12-20 15:42:18",
       threat: "Ransomware Detection",
       target: "WS-PROD-045",
       severity: "CRITICAL",
       aiConfidence: 96.8,
-      action: "HOST_ISOLATION",
+      action: "HOST_ISOLATION_RECOMMENDED",
       actionReason: "악성 암호화 활동 탐지 및 측면 이동 위험성",
       ruleMatched: "RULE-RANSOMWARE-001",
       responseTime: "0.8초",
-      status: "SUCCESS",
-      impact: "호스트 격리 완료, 추가 피해 차단",
-      followupRequired: false,
+      status: "RECOMMENDED",
+      impact: "보안팀에 격리 권고 전송, 분석 보고서 생성",
+      followupRequired: true,
       mitreId: "T1486",
       evidenceFiles: ["encrypt.exe", "ransom.txt", "shadow_delete.bat"],
     },
     {
-      id: "auto-002",
+      id: "rec-002",
       timestamp: "2024-12-20 15:38:45",
       threat: "Lateral Movement Attempt",
       target: "SRV-DB-012",
       severity: "HIGH",
       aiConfidence: 89.3,
-      action: "NETWORK_BLOCK",
+      action: "NETWORK_MONITORING_RECOMMENDED",
       actionReason: "비정상적인 네트워크 연결 패턴 및 권한 상승 시도",
       ruleMatched: "RULE-LATERAL-MOVEMENT-003",
       responseTime: "1.2초",
-      status: "SUCCESS",
-      impact: "측면 이동 차단, 추가 시스템 침해 방지",
-      followupRequired: false,
+      status: "RECOMMENDED",
+      impact: "네트워크 감시 권고 전송, 상세 분석 보고서 생성",
+      followupRequired: true,
       mitreId: "T1021",
       evidenceFiles: ["psexec.exe", "net_commands.log"],
     },
     {
-      id: "auto-003",
+      id: "rec-003",
       timestamp: "2024-12-20 15:35:12",
       threat: "Process Injection",
       target: "WS-ADMIN-003",
       severity: "MEDIUM",
       aiConfidence: 82.1,
-      action: "PROCESS_KILL",
+      action: "PROCESS_ANALYSIS_RECOMMENDED",
       actionReason: "DLL 인젝션 패턴 탐지, 메모리 조작 시도",
       ruleMatched: "RULE-PROCESS-INJECTION-002",
       responseTime: "0.5초",
-      status: "SUCCESS",
-      impact: "악성 프로세스 종료, 시스템 안정성 유지",
+      status: "RECOMMENDED",
+      impact: "프로세스 분석 권고 전송, 메모리 덤프 생성",
       followupRequired: true,
       mitreId: "T1055",
       evidenceFiles: ["injected.dll", "memory_dump.bin"],
@@ -345,8 +345,8 @@ export default function ResponsePage() {
   const tabs = [
     { id: "overview", label: "통계 현황" },
     { id: "incidents", label: "활성 위협" },
-    { id: "autoLogs", label: "자동 대응" },
-    { id: "manualRequired", label: "수동 검토" },
+    { id: "autoLogs", label: "대응 제안" },
+    { id: "manualRequired", label: "전문가 검토" },
   ];
 
   const { isLoggedIn, logout, isLoading } = useAuth();
@@ -387,10 +387,12 @@ export default function ResponsePage() {
     switch (status.toLowerCase()) {
       case "responding":
         return "text-red-400 bg-red-500/10 border-red-500/30";
-      case "blocked":
+      case "monitoring":
         return "text-orange-400 bg-orange-500/10 border-orange-500/30";
       case "investigating":
         return "text-yellow-400 bg-yellow-500/10 border-yellow-500/30";
+      case "recommended":
+        return "text-blue-400 bg-blue-500/10 border-blue-500/30";
       case "contained":
         return "text-green-400 bg-green-500/10 border-green-500/30";
       default:
@@ -421,32 +423,32 @@ export default function ResponsePage() {
               </div>
               <div className="flex-1 text-center">
                 <span className="text-slate-400 text-sm font-mono">
-                  auto-response://loading --threat-mitigation
+                  response-recommend://loading --threat-mitigation
                 </span>
               </div>
             </div>
             <div className="p-6">
               <div className="text-cyan-400 font-mono text-sm mb-4">
-                $ threat-response --load-playbooks --autonomous
+                $ threat-response --load-recommendations --advisory
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-4 h-4 border-2 border-cyan-500/50 border-t-cyan-500 rounded-full animate-spin"></div>
                 <span className="text-slate-300 font-mono text-sm">
-                  자동 대응 시스템 로딩 중...
+                  대응 제안 시스템 로딩 중...
                 </span>
               </div>
               <div className="space-y-2 text-xs font-mono">
                 <div className="text-slate-400">
-                  {">"} Loading response playbooks
+                  {">"} Loading response recommendations
                 </div>
                 <div className="text-slate-400">
-                  {">"} Initializing auto-isolation
+                  {">"} Initializing recommendation engine
                 </div>
                 <div className="text-slate-400">
-                  {">"} Checking quarantine systems
+                  {">"} Checking advisory systems
                 </div>
                 <div className="text-cyan-400 animate-pulse">
-                  {">"} Activating threat response...
+                  {">"} Activating response advisor...
                 </div>
               </div>
             </div>
@@ -487,7 +489,7 @@ export default function ResponsePage() {
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <span className="text-slate-400 text-sm font-mono ml-2">
-              auto-response://threat-mitigation --real-time
+              response-recommend://threat-mitigation --suggestions
             </span>
           </div>
 
@@ -495,16 +497,16 @@ export default function ResponsePage() {
             <div className="flex items-center gap-4 text-sm font-mono mb-4">
               <span className="text-cyan-400">security@response:~$</span>
               <span className="text-slate-300">
-                manage --automated-response --containment
+                manage --response-recommendations --containment
               </span>
             </div>
 
             <div>
               <h1 className="text-2xl font-bold text-cyan-400 font-mono mb-2">
-                Automated Response System
+                보안 대응 제안 센터
               </h1>
               <p className="text-slate-400 font-mono text-sm">
-                위협을 자동으로 차단하고 격리하는 시스템을 관리하세요
+                위험 상황에 대한 대응 방안을 제안하고 관리하세요
               </p>
             </div>
           </div>
@@ -525,8 +527,8 @@ export default function ResponsePage() {
               desc: "현재 대응 중",
             },
             {
-              label: "자동 차단",
-              value: mockResponseData.statistics.autoBlocked,
+              label: "제안된 대응",
+              value: mockResponseData.statistics.recommendedActions,
               color: "text-orange-400",
               desc: "24시간 내",
             },
@@ -540,7 +542,7 @@ export default function ResponsePage() {
               label: "평균 대응시간",
               value: `${mockResponseData.statistics.avgResponseTime}초`,
               color: "text-green-400",
-              desc: "자동 대응",
+              desc: "제안 생성",
             },
             {
               label: "성공률",
@@ -549,10 +551,10 @@ export default function ResponsePage() {
               desc: "대응 성공",
             },
             {
-              label: "격리 호스트",
-              value: mockResponseData.statistics.isolatedHosts,
+              label: "신고된 사건",
+              value: mockResponseData.statistics.reportedIncidents,
               color: "text-purple-400",
-              desc: "현재 격리됨",
+              desc: "보고됨",
             },
           ].map((stat, index) => (
             <motion.div
@@ -662,8 +664,8 @@ export default function ResponsePage() {
                               {type.count}회
                             </span>
                             {type.automated && (
-                              <span className="text-xs px-2 py-1 rounded border bg-green-500/10 border-green-500/30 text-green-400 font-mono">
-                                AUTO
+                              <span className="text-xs px-2 py-1 rounded border bg-blue-500/10 border-blue-500/30 text-blue-400 font-mono">
+                                제안
                               </span>
                             )}
                           </div>
@@ -849,13 +851,13 @@ export default function ResponsePage() {
                             </div>
                             <div className="flex gap-2">
                               <button className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 rounded text-blue-300 font-mono text-xs transition-colors">
-                                상세 분석
-                              </button>
-                              <button className="px-3 py-1 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 rounded text-yellow-300 font-mono text-xs transition-colors">
-                                수동 조치
+                                상세 모니터링
                               </button>
                               <button className="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 rounded text-green-300 font-mono text-xs transition-colors">
-                                격리 해제
+                                분석 보고서
+                              </button>
+                              <button className="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/50 rounded text-purple-300 font-mono text-xs transition-colors">
+                                전문가 상담
                               </button>
                             </div>
                           </div>
@@ -890,10 +892,10 @@ export default function ResponsePage() {
 
               <div className="p-4">
                 <h3 className="text-cyan-400 font-mono text-lg mb-4">
-                  AI 자동대응 로그
+                  보안 대응 제안 및 가이드
                 </h3>
                 <div className="space-y-4">
-                  {mockResponseData.autoResponseLogs.map((log, index) => (
+                  {mockResponseData.recommendationLogs.map((log, index) => (
                     <motion.div
                       key={log.id}
                       initial={{ opacity: 0, x: -20 }}
@@ -917,8 +919,8 @@ export default function ResponsePage() {
                           >
                             {log.severity}
                           </span>
-                          <span className="text-green-400 bg-green-500/10 border border-green-500/30 text-xs px-2 py-1 rounded font-mono">
-                            AUTO
+                          <span className="text-blue-400 bg-blue-500/10 border border-blue-500/30 text-xs px-2 py-1 rounded font-mono">
+                            제안
                           </span>
                         </div>
                         <span className="text-slate-400 font-mono text-sm">
@@ -926,7 +928,7 @@ export default function ResponsePage() {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div>
                           <div className="text-slate-400 font-mono text-xs mb-1">
                             대상 시스템
@@ -937,18 +939,10 @@ export default function ResponsePage() {
                         </div>
                         <div>
                           <div className="text-slate-400 font-mono text-xs mb-1">
-                            AI 신뢰도
+                            위험도
                           </div>
                           <div className="text-green-400 font-mono text-sm">
                             {log.aiConfidence}%
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-slate-400 font-mono text-xs mb-1">
-                            대응 시간
-                          </div>
-                          <div className="text-purple-400 font-mono text-sm">
-                            {log.responseTime}
                           </div>
                         </div>
                         <div>
@@ -963,19 +957,78 @@ export default function ResponsePage() {
 
                       <div className="mb-4">
                         <div className="text-slate-400 font-mono text-xs mb-2">
-                          AI 대응 근거
+                          권장 대응 조치 및 근거
                         </div>
                         <div className="text-slate-300 font-mono text-sm bg-slate-900/50 p-3 rounded border border-slate-600/30">
-                          {log.actionReason}
+                          <div className="mb-3">
+                            <span className="text-cyan-400 font-semibold">
+                              권장 조치:{" "}
+                            </span>
+                            {log.action === "HOST_ISOLATION_RECOMMENDED" &&
+                              "해당 시스템을 즉시 네트워크에서 분리"}
+                            {log.action === "NETWORK_MONITORING_RECOMMENDED" &&
+                              "네트워크 트래픽 실시간 모니터링 강화"}
+                            {log.action === "PROCESS_ANALYSIS_RECOMMENDED" &&
+                              "의심스러운 프로세스 상세 분석 실시"}
+                          </div>
+                          <div>
+                            <span className="text-yellow-400 font-semibold">
+                              근거:{" "}
+                            </span>
+                            {log.actionReason}
+                          </div>
                         </div>
                       </div>
 
                       <div className="mb-4">
                         <div className="text-slate-400 font-mono text-xs mb-2">
-                          대응 결과 및 영향
+                          구체적 대응 방법
                         </div>
                         <div className="text-slate-300 font-mono text-sm bg-slate-900/50 p-3 rounded border border-slate-600/30">
-                          {log.impact}
+                          {log.action === "HOST_ISOLATION_RECOMMENDED" && (
+                            <div className="space-y-2">
+                              <div>
+                                • 1단계: 네트워크 케이블 분리 또는 Wi-Fi 연결
+                                해제
+                              </div>
+                              <div>
+                                • 2단계: 현재 실행 중인 모든 프로그램 목록 확인
+                              </div>
+                              <div>• 3단계: 시스템 이벤트 로그 백업</div>
+                              <div>• 4단계: 보안팀에 즉시 연락 (내선 1234)</div>
+                            </div>
+                          )}
+                          {log.action === "NETWORK_MONITORING_RECOMMENDED" && (
+                            <div className="space-y-2">
+                              <div>
+                                • 1단계: 방화벽 로그 실시간 모니터링 활성화
+                              </div>
+                              <div>
+                                • 2단계: 의심스러운 IP 주소 차단 목록 확인
+                              </div>
+                              <div>• 3단계: 네트워크 트래픽 패턴 분석</div>
+                              <div>• 4단계: 30분마다 상황 보고</div>
+                            </div>
+                          )}
+                          {log.action === "PROCESS_ANALYSIS_RECOMMENDED" && (
+                            <div className="space-y-2">
+                              <div>
+                                • 1단계: 작업 관리자에서 CPU/메모리 사용량 높은
+                                프로세스 확인
+                              </div>
+                              <div>
+                                • 2단계: Process Explorer로 상세 프로세스 트리
+                                분석
+                              </div>
+                              <div>
+                                • 3단계: 의심 프로세스의 파일 위치 및 디지털
+                                서명 확인
+                              </div>
+                              <div>
+                                • 4단계: 필요시 프로세스 메모리 덤프 생성
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -993,8 +1046,8 @@ export default function ResponsePage() {
                           </span>
                         </div>
                         {log.followupRequired && (
-                          <span className="text-xs px-2 py-1 rounded border bg-yellow-500/10 border-yellow-500/30 text-yellow-400 font-mono">
-                            후속 조치 필요
+                          <span className="text-xs px-2 py-1 rounded border bg-green-500/10 border-green-500/30 text-green-400 font-mono">
+                            관리자 확인 필요
                           </span>
                         )}
                       </div>
@@ -1028,7 +1081,7 @@ export default function ResponsePage() {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-cyan-400 font-mono text-lg">
-                    수동 대응 필요 항목
+                    전문가 검토 필요 항목
                   </h3>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -1061,8 +1114,8 @@ export default function ResponsePage() {
                           >
                             {item.priority}
                           </span>
-                          <span className="text-orange-400 bg-orange-500/10 border border-orange-500/30 text-xs px-2 py-1 rounded font-mono">
-                            MANUAL
+                          <span className="text-purple-400 bg-purple-500/10 border border-purple-500/30 text-xs px-2 py-1 rounded font-mono">
+                            검토
                           </span>
                         </div>
                         <span className="text-slate-400 font-mono text-sm">
@@ -1081,10 +1134,10 @@ export default function ResponsePage() {
                         </div>
                         <div>
                           <div className="text-slate-400 font-mono text-xs mb-1">
-                            AI 신뢰도
+                            복잡도 지수
                           </div>
                           <div className="text-yellow-400 font-mono text-sm">
-                            {item.aiConfidence}% (임계값 미달)
+                            {item.aiConfidence}% (고복잡도)
                           </div>
                         </div>
                         <div>
@@ -1099,44 +1152,117 @@ export default function ResponsePage() {
 
                       <div className="mb-4">
                         <div className="text-slate-400 font-mono text-xs mb-2">
-                          자동대응 불가 사유
-                        </div>
-                        <div className="text-red-300 font-mono text-sm bg-red-500/5 p-3 rounded border border-red-500/20">
-                          {item.whyNotAutomatic}
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <div className="text-slate-400 font-mono text-xs mb-2">
-                          위험 평가
-                        </div>
-                        <div className="text-slate-300 font-mono text-sm bg-slate-900/50 p-3 rounded border border-slate-600/30">
-                          {item.riskAssessment}
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <div className="text-slate-400 font-mono text-xs mb-2">
-                          AI 권장 대응 방안
-                        </div>
-                        <div className="space-y-2">
-                          {item.suggestedActions.map((action, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                              <span className="text-green-400">•</span>
-                              <span className="text-slate-300 font-mono text-sm">
-                                {action}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <div className="text-slate-400 font-mono text-xs mb-2">
-                          AI 최종 권고사항
+                          전문가 검토 필요사항
                         </div>
                         <div className="text-blue-300 font-mono text-sm bg-blue-500/5 p-3 rounded border border-blue-500/20">
-                          {item.aiRecommendation}
+                          {item.threat === "Advanced Persistent Threat" &&
+                            "복잡한 APT 공격 패턴으로 다단계 분석과 전문가 판단이 필요합니다."}
+                          {item.threat === "Data Exfiltration Attempt" &&
+                            "개발 환경 특성상 정상 업무와 구분하기 위한 세밀한 분석이 필요합니다."}
+                          {item.threat === "Privilege Escalation" &&
+                            "금융 시스템 접근 권한 변경으로 업무 영향도를 고려한 신중한 검토가 필요합니다."}
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <div className="text-slate-400 font-mono text-xs mb-2">
+                          비즈니스 영향도 분석
+                        </div>
+                        <div className="text-slate-300 font-mono text-sm bg-slate-900/50 p-3 rounded border border-slate-600/30">
+                          {item.threat === "Advanced Persistent Threat" &&
+                            "파일 서버 침해 시 전사 업무 중단 위험. 단계적 대응으로 업무 연속성 보장 필요."}
+                          {item.threat === "Data Exfiltration Attempt" &&
+                            "개발 소스코드 유출 가능성. 지적재산권 보호와 개발 업무 지속성 균형 고려 필요."}
+                          {item.threat === "Privilege Escalation" &&
+                            "금융 거래 시스템 접근 권한 변경. 금융 규제 준수와 업무 중단 최소화 방안 필요."}
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <div className="text-slate-400 font-mono text-xs mb-2">
+                          권장 분석 절차
+                        </div>
+                        <div className="space-y-2">
+                          {item.threat === "Advanced Persistent Threat" && (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  네트워크 트래픽 패턴 상세 분석
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  파일 접근 이력 및 무결성 검사
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  사용자 계정 활동 패턴 분석
+                                </span>
+                              </div>
+                            </>
+                          )}
+                          {item.threat === "Data Exfiltration Attempt" && (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  전송 데이터 내용 및 목적지 확인
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  개발자 업무 패턴과 비교 분석
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  정상 업무 여부 사용자 확인
+                                </span>
+                              </div>
+                            </>
+                          )}
+                          {item.threat === "Privilege Escalation" && (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  권한 변경 요청 내역 확인
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  금융 규제 준수 사항 검토
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400">•</span>
+                                <span className="text-slate-300 font-mono text-sm">
+                                  관리자 승인 하에 임시 권한 제한
+                                </span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <div className="text-slate-400 font-mono text-xs mb-2">
+                          전문가 검토 가이드
+                        </div>
+                        <div className="text-green-300 font-mono text-sm bg-green-500/5 p-3 rounded border border-green-500/20">
+                          {item.threat === "Advanced Persistent Threat" &&
+                            "보안 전문가와 시스템 관리자가 협력하여 단계적 대응 전략을 수립하세요. 업무 중단 최소화를 위해 우선순위를 정하여 진행하세요."}
+                          {item.threat === "Data Exfiltration Attempt" &&
+                            "개발팀장과 보안팀이 합동으로 해당 데이터의 민감도를 평가하고, 정상 업무 여부를 확인한 후 대응 방향을 결정하세요."}
+                          {item.threat === "Privilege Escalation" &&
+                            "정보보호 담당자와 준법감시인이 참여하여 금융 규제 위반 여부를 검토하고, 비즈니스 연속성을 고려한 대응 방안을 마련하세요."}
                         </div>
                       </div>
 
@@ -1154,14 +1280,14 @@ export default function ResponsePage() {
                           </span>
                         </div>
                         <div className="flex gap-2">
-                          <button className="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 rounded text-green-300 font-mono text-xs transition-colors">
-                            승인 후 자동실행
-                          </button>
                           <button className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 rounded text-blue-300 font-mono text-xs transition-colors">
-                            상세 조사
+                            상세 분석 시작
                           </button>
-                          <button className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 rounded text-red-300 font-mono text-xs transition-colors">
-                            거부
+                          <button className="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 rounded text-green-300 font-mono text-xs transition-colors">
+                            전문가 배정
+                          </button>
+                          <button className="px-3 py-1 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/50 rounded text-yellow-300 font-mono text-xs transition-colors">
+                            우선순위 변경
                           </button>
                         </div>
                       </div>

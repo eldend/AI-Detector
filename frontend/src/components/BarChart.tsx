@@ -47,7 +47,7 @@ export default function BarChart({
     labels: chartData.map((item) => item.user),
     datasets: [
       {
-        label: "Normal",
+        label: "정상",
         data: chartData.map((item) => item.normalCount),
         backgroundColor: color,
         borderColor: color,
@@ -55,7 +55,7 @@ export default function BarChart({
         borderRadius: 4,
       },
       {
-        label: "Anomaly",
+        label: "위험",
         data: chartData.map((item) => item.anomalyCount),
         backgroundColor: "#ef4444",
         borderColor: "#dc2626",

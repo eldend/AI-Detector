@@ -10,16 +10,18 @@ interface EventDetailProps {
 
 export default function EventDetail({
   event,
-  title = "Event Analysis",
+  title = "이벤트 분석",
 }: EventDetailProps) {
   if (!event) {
     return (
       <div className="h-full flex items-center justify-center bg-transparent font-mono">
         <div className="text-center">
-          <div className="text-slate-500 text-4xl mb-4">◯</div>
-          <div className="text-slate-400 text-sm mb-2">No Event Selected</div>
+          <div className="text-slate-500 text-4xl mb-4">○</div>
+          <div className="text-slate-400 text-sm mb-2">
+            선택된 이벤트가 없습니다
+          </div>
           <div className="text-slate-500 text-xs">
-            Click on an event in the table to view details
+            표에서 이벤트를 클릭하면 상세 정보를 볼 수 있습니다
           </div>
         </div>
       </div>
@@ -60,7 +62,7 @@ export default function EventDetail({
           <div className="no-drag">
             <div className="flex justify-between items-start mb-2">
               <div className="text-slate-400 text-xs uppercase tracking-wide">
-                Event ID
+                이벤트 ID
               </div>
               <div className="text-slate-500 text-xs font-mono">
                 {event.date}
@@ -74,7 +76,7 @@ export default function EventDetail({
           {/* Anomaly Score Section */}
           <div className="no-drag">
             <div className="text-slate-400 text-xs uppercase tracking-wide mb-2">
-              Anomaly Score
+              위험도 점수
             </div>
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
@@ -91,10 +93,10 @@ export default function EventDetail({
                   )}`}
                 >
                   {event.anomalyScore < 0.5
-                    ? "Normal"
+                    ? "정상"
                     : event.anomalyScore < 0.8
-                    ? "Warning"
-                    : "Anomaly"}
+                    ? "주의"
+                    : "위험"}
                 </span>
               </div>
 
@@ -108,8 +110,8 @@ export default function EventDetail({
                 ></div>
               </div>
               <div className="flex justify-between text-xs text-slate-500 mt-1 font-mono">
-                <span>0.000</span>
-                <span>1.000</span>
+                <span>0.000 (안전)</span>
+                <span>1.000 (위험)</span>
               </div>
             </div>
           </div>
@@ -117,7 +119,7 @@ export default function EventDetail({
           {/* Incident Details */}
           <div className="no-drag">
             <div className="text-slate-400 text-xs uppercase tracking-wide mb-2">
-              Incident Description
+              상세 설명
             </div>
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
               <div className="text-slate-300 text-sm font-mono leading-relaxed">
@@ -129,7 +131,7 @@ export default function EventDetail({
           {/* Raw Data Section */}
           <div className="no-drag">
             <div className="text-slate-400 text-xs uppercase tracking-wide mb-2">
-              Raw Event Data
+              원본 이벤트 데이터
             </div>
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg">
               <div className="max-h-60 overflow-y-auto p-3 custom-scrollbar">
@@ -137,7 +139,24 @@ export default function EventDetail({
                   {Object.entries(event.rowData).map(([key, value], index) => (
                     <div key={key} className="flex flex-col sm:flex-row">
                       <div className="text-cyan-400 font-mono text-xs font-semibold min-w-0 sm:w-1/3 mb-1 sm:mb-0">
-                        {key}:
+                        {key === "ip_address"
+                          ? "IP 주소"
+                          : key === "user"
+                          ? "사용자"
+                          : key === "number"
+                          ? "번호"
+                          : key === "location"
+                          ? "위치"
+                          : key === "timestamp"
+                          ? "발생시간"
+                          : key === "event_type"
+                          ? "이벤트 유형"
+                          : key === "anomaly_score"
+                          ? "위험도 점수"
+                          : key === "status"
+                          ? "상태"
+                          : key}
+                        :
                       </div>
                       <div className="text-slate-300 font-mono text-xs break-all sm:w-2/3">
                         "{value}"
@@ -154,10 +173,10 @@ export default function EventDetail({
       {/* Fixed Action Buttons */}
       <div className="flex justify-between space-x-3 flex-shrink-0 pt-4 mt-4 border-t border-slate-700/50 no-drag">
         <button className="flex-1 bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 border border-slate-600/50 hover:border-slate-500 text-xs px-3 py-2 rounded font-mono uppercase tracking-wide transition-all duration-200">
-          Ignore
+          무시하기
         </button>
         <button className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 hover:border-red-500/50 text-xs px-3 py-2 rounded font-mono uppercase tracking-wide transition-all duration-200">
-          Take Action
+          조치 취하기
         </button>
       </div>
 
